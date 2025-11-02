@@ -63,7 +63,7 @@ class GlowingCircles extends StatelessWidget {
           textSize: 25,
           textClr: whiteClr,
           textWeight: FontWeight.w900,
-          textFont: "DancingScript",
+          textFont: primaryFont,
         ),
         Positioned(
           top: 65,

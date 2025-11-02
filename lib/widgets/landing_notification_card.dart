@@ -39,7 +39,7 @@ class LandingNotificationCard extends StatelessWidget {
                       textSize: 13,
                       textWeight: FontWeight.w900,
                       textClr: whiteClr,
-                      textFont: 'DancingScript',
+                      textFont: primaryFont,
                     ),
                     BuildText(
                       text: "Netflix Subscription",

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+const primaryFont = "DancingScript";
+
+const buttonFill = Color(0xFF1C4EB5);
+const buttonBorder = Color(0xFF1C4EB5);
+
 const blackClr = Colors.black;
 const whiteClr = Colors.white;
 const transparentClr = Colors.transparent;

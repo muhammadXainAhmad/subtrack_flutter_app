@@ -2,24 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/text.dart';
 
-class LandingElevatedBtn extends StatelessWidget {
+class CustomElevatedButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final bool isFilled;
   final double width;
+  final bool isRow;
+  final String? path;
 
-  const LandingElevatedBtn({
+  const CustomElevatedButton({
     super.key,
     required this.text,
     required this.onPressed,
     this.isFilled = true,
     required this.width,
+    this.isRow = false,
+    this.path,
   });
 
   @override
   Widget build(BuildContext context) {
-    const buttonFill = Color(0xFF1C4EB5);
-    const buttonBorder = Color(0xFF1C4EB5);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: isFilled ? buttonFill : Colors.transparent,
@@ -28,17 +30,25 @@ class LandingElevatedBtn extends StatelessWidget {
             isFilled
                 ? BorderSide.none
                 : const BorderSide(color: buttonBorder, width: 1.8),
-        minimumSize: Size(width * 0.7, 50),
-        maximumSize: Size(width * 0.7, 50),
+        fixedSize: Size(width * 0.85, 55),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 0,
       ),
       onPressed: onPressed,
-      child: BuildText(
-        text: text,
-        textSize: 15,
-        textClr: whiteClr,
-        textWeight: FontWeight.w500,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (isRow) ...[
+            Image.asset(path!, width: 30, height: 30),
+            const SizedBox(width: 10),
+          ],
+          BuildText(
+            text: text,
+            textSize: 15,
+            textClr: whiteClr,
+            textWeight: FontWeight.w500,
+          ),
+        ],
       ),
     );
   }
