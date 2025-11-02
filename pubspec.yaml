@@ -55,6 +55,9 @@ flutter:
     - assets/images/faces15.png
     - assets/images/faces18.png
     - assets/images/googleLogo.png
+    - assets/images/forgotIllustration1.png
+    - assets/images/forgotIcon1.png
+    - assets/images/forgotIcon2.png
 
   fonts:
     - family: DancingScript
