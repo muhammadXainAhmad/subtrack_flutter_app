@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:subtrack/screens/landing_screen_one.dart';
+import 'package:subtrack/utils/utils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,6 +13,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SubTrack',
+      themeMode: ThemeMode.system,
+      theme: lightThemeData(),
+      darkTheme: darkThemeData(),
+      home: LandingScreenOne(),
     );
   }
 }
