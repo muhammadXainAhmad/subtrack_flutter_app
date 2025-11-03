@@ -17,7 +17,7 @@ class BgContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: screenW,
-      height: screenH * 0.35,
+      height: screenH * 0.3,
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.only(

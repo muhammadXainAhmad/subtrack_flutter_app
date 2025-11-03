@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/text.dart';
 
-class CustomElevatedButton extends StatelessWidget {
+class LandingElevatedButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final bool isFilled;
@@ -10,7 +10,7 @@ class CustomElevatedButton extends StatelessWidget {
   final bool isRow;
   final String? path;
 
-  const CustomElevatedButton({
+  const LandingElevatedButton({
     super.key,
     required this.text,
     required this.onPressed,

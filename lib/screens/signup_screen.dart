@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:subtrack/screens/landing_screen.dart';
 import 'package:subtrack/screens/login_screen.dart';
 import 'package:subtrack/utils/utils.dart';
-import 'package:subtrack/widgets/custom_elevated_button.dart';
+import 'package:subtrack/widgets/landing_elevated_button.dart';
 import 'package:subtrack/widgets/custom_text_button.dart';
 import 'package:subtrack/widgets/custom_textfield.dart';
 import 'package:subtrack/widgets/landing_animate_gradient.dart';
@@ -109,7 +109,7 @@ class SignupScreen extends StatelessWidget {
                                       isPassoword: true,
                                     ),
                                     const SizedBox(height: 10),
-                                    CustomElevatedButton(
+                                    LandingElevatedButton(
                                       text: "Sign Up",
                                       isFilled: true,
                                       onPressed: () {},
@@ -139,7 +139,7 @@ class SignupScreen extends StatelessWidget {
                                       ],
                                     ),
                                     const SizedBox(height: 10),
-                                    CustomElevatedButton(
+                                    LandingElevatedButton(
                                       text: "Continue with Google",
                                       isFilled: false,
                                       isRow: true,

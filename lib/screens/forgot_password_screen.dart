@@ -3,7 +3,7 @@ import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/custom_text_button.dart';
 import 'package:subtrack/widgets/custom_textfield.dart';
 import 'package:subtrack/widgets/landing_animate_gradient.dart';
-import 'package:subtrack/widgets/custom_elevated_button.dart';
+import 'package:subtrack/widgets/landing_elevated_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
@@ -85,7 +85,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                                     isPassoword: false,
                                   ),
                                   const SizedBox(height: 10),
-                                  CustomElevatedButton(
+                                  LandingElevatedButton(
                                     text: "Reset",
                                     isFilled: true,
                                     onPressed: () {},

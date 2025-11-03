@@ -27,7 +27,7 @@ class BuildText extends StatelessWidget {
         color: textClr ?? colorScheme.onSurface,
         fontSize: textSize,
         fontWeight: textWeight ?? FontWeight.normal,
-        fontFamily: textFont
+        fontFamily: textFont,
       ),
     );
   }

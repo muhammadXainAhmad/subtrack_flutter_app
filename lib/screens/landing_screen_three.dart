@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:subtrack/screens/login_screen.dart';
 import 'package:subtrack/screens/signup_screen.dart';
 import 'package:subtrack/utils/utils.dart';
-import 'package:subtrack/widgets/custom_elevated_button.dart';
+import 'package:subtrack/widgets/landing_elevated_button.dart';
 import 'package:subtrack/widgets/landing_notification_card.dart';
 import 'package:subtrack/widgets/text.dart';
 
@@ -53,7 +53,7 @@ class LandingScreenThree extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 100),
-            CustomElevatedButton(
+            LandingElevatedButton(
               isFilled: true,
               text: "Login",
               onPressed:
@@ -68,7 +68,7 @@ class LandingScreenThree extends StatelessWidget {
             const SizedBox(height: 20),
             const BuildText(text: "OR", textSize: 14, textClr: whiteClr),
             const SizedBox(height: 20),
-            CustomElevatedButton(
+            LandingElevatedButton(
               isFilled: false,
               text: "Create a new account",
               onPressed:

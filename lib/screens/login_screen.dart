@@ -6,7 +6,7 @@ import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/custom_text_button.dart';
 import 'package:subtrack/widgets/custom_textfield.dart';
 import 'package:subtrack/widgets/landing_animate_gradient.dart';
-import 'package:subtrack/widgets/custom_elevated_button.dart';
+import 'package:subtrack/widgets/landing_elevated_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -85,7 +85,7 @@ class LoginScreen extends StatelessWidget {
                                     isPassoword: true,
                                   ),
                                   const SizedBox(height: 10),
-                                  CustomElevatedButton(
+                                  LandingElevatedButton(
                                     text: "Log In",
                                     isFilled: true,
                                     onPressed: () {},
@@ -124,7 +124,7 @@ class LoginScreen extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 10),
-                                  CustomElevatedButton(
+                                  LandingElevatedButton(
                                     text: "Continue with Google",
                                     isFilled: false,
                                     isRow: true,
