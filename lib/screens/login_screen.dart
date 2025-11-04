@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:subtrack/screens/forgot_password_screen.dart';
+import 'package:subtrack/screens/home_screen.dart';
 import 'package:subtrack/screens/landing_screen.dart';
 import 'package:subtrack/screens/signup_screen.dart';
 import 'package:subtrack/utils/utils.dart';
@@ -29,7 +30,7 @@ class LoginScreen extends StatelessWidget {
                 FocusScope.of(context).unfocus();
                 Future.delayed(const Duration(milliseconds: 100), () {
                   if (context.mounted) {
-                    // ******************************WILL HANDLE WITH PROVIDER********************************
+                    // 1. Handle moving from LoginScreen to LandingThree with Provider ***********************************
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -88,7 +89,15 @@ class LoginScreen extends StatelessWidget {
                                   LandingElevatedButton(
                                     text: "Log In",
                                     isFilled: true,
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => HomeScreen(),
+                                        ),
+                                        (route) => false,
+                                      );
+                                    },
                                     width: screenW,
                                   ),
                                   CustomTextButton(

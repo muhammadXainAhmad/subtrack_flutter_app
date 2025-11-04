@@ -21,8 +21,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: transparentClr,
             leading: IconButton(
-              onPressed: // ******************************WILL HANDLE WITH PROVIDER********************************
-                  () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(context),
               icon: Icon(Icons.arrow_back, color: whiteClr, size: 26),
             ),
           ),
@@ -32,7 +31,6 @@ class ForgotPasswordScreen extends StatelessWidget {
                 reverse: true,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
-
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 18),

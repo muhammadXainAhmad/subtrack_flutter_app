@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 const primaryFont = "DancingScript";
 
@@ -8,6 +9,18 @@ const buttonBorder = Color(0xFF1C4EB5);
 const blackClr = Colors.black;
 const whiteClr = Colors.white;
 const transparentClr = Colors.transparent;
+
+SvgPicture customSvg({
+  required String path,
+  required ColorScheme colorScheme,
+  double? width,
+}) {
+  return SvgPicture.asset(
+    "assets/icons/$path.svg",
+    colorFilter: ColorFilter.mode(colorScheme.onSurface, BlendMode.srcIn),
+    width: width,
+  );
+}
 
 ThemeData lightThemeData() {
   return ThemeData(

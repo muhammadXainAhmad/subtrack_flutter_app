@@ -62,6 +62,15 @@ flutter:
     - assets/icons/history.svg
     - assets/icons/notification.svg
     - assets/icons/settings.svg
+    - assets/icons/left.svg
+    - assets/icons/right.svg
+    - assets/icons/person.svg
+    - assets/icons/star.svg
+    - assets/icons/logout.svg
+    - assets/icons/home.svg
+    - assets/icons/newspaper.svg
+    - assets/icons/chart.svg
+    - assets/icons/add.svg
 
   fonts:
     - family: DancingScript

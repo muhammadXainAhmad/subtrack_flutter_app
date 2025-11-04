@@ -8,7 +8,7 @@ import 'package:subtrack/widgets/custom_textfield.dart';
 import 'package:subtrack/widgets/landing_animate_gradient.dart';
 import 'package:subtrack/widgets/text.dart';
 
-// COMBINE LOGIN AND SIGNUP INTO ONE & USE BOOL ISLOGIN?
+// COMBINE LOGIN AND SIGNUP INTO ONE & USE BOOL ISLOGIN?Combine LoginScreen & SignupScreen into 1 & use bool isLogin? (MAY OR MAY NOT)
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
 

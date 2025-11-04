@@ -1,18 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:subtrack/screens/create_subscription_screen.dart';
+import 'package:subtrack/screens/settings_screen.dart';
+import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
 import 'package:subtrack/widgets/segmented_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        onPressed: () {},
+        backgroundColor: colorScheme.surfaceContainer,
+        child: customSvg(path: "add", colorScheme: colorScheme, width: 32),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: NavigationBar(
+            backgroundColor: colorScheme.surfaceContainer,
+            height: 60,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+            destinations: [
+              NavigationDestination(
+                icon: customSvg(path: "home", colorScheme: colorScheme),
+                label: "home",
+              ),
+              NavigationDestination(
+                icon: customSvg(path: "newspaper", colorScheme: colorScheme),
+                label: "newspaper",
+              ),
+              NavigationDestination(
+                icon: customSvg(path: "chart", colorScheme: colorScheme),
+                label: "chart",
+              ),
+              NavigationDestination(
+                icon: customSvg(path: "person", colorScheme: colorScheme),
+                label: "person",
+              ),
+            ],
+            selectedIndex: currentIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
+          ),
+        ),
+      ),
       body: CustomScrollView(
         physics: BouncingScrollPhysics(),
         slivers: [
@@ -42,56 +92,42 @@ class HomeScreen extends StatelessWidget {
             ),
             actionsPadding: EdgeInsets.only(right: 6),
             actions: [
-              IconButton(
-                onPressed: () {},
-                icon: SvgPicture.asset(
-                  "assets/icons/history.svg",
-                  colorFilter: ColorFilter.mode(
-                    colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+              _buildActionIcon(
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateSubscriptionScreen(),
+                      ),
+                    ),
+                path: "history",
+                colorScheme: colorScheme,
               ),
-              IconButton(
+              _buildActionIcon(
                 onPressed: () {},
-                icon: SvgPicture.asset(
-                  "assets/icons/notification.svg",
-                  colorFilter: ColorFilter.mode(
-                    colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                path: "notification",
+                colorScheme: colorScheme,
               ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
-                },
-                icon: SvgPicture.asset(
-                  "assets/icons/settings.svg",
-                  colorFilter: ColorFilter.mode(
-                    colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+              _buildActionIcon(
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SettingsScreen()),
+                    ),
+                path: "settings",
+                colorScheme: colorScheme,
               ),
             ],
           ),
           SliverToBoxAdapter(
             child: Stack(
               children: [
-                BgContainer(
-                  screenW: screenW,
-                  screenH: screenH,
-                  color: colorScheme.surfaceContainer,
-                ),
+                BgContainer(screenW: screenW, screenH: screenH),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18.0),
                   child: Column(
                     children: [
-                      SizedBox(height: 25),
+                      const SizedBox(height: 25),
                       Card(
                         color: colorScheme.surfaceContainerHigh,
                         shape: RoundedRectangleBorder(
@@ -107,7 +143,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              Row(
+                              const Row(
                                 children: [
                                   BuildText(
                                     text: "Monthly Bills",
@@ -121,12 +157,12 @@ class HomeScreen extends StatelessWidget {
                                   BuildText(text: "Monthly", textSize: 12),
                                 ],
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
-                                  BuildText(
+                                  const BuildText(
                                     text: "\$1,532",
                                     textSize: 32,
                                     textWeight: FontWeight.w700,
@@ -155,7 +191,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -168,9 +204,9 @@ class HomeScreen extends StatelessWidget {
                                   color: colorScheme.surfaceContainerLowest,
                                 ),
                               ),
-                              child: SizedBox(
+                              child: const SizedBox(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
+                                  padding: EdgeInsets.symmetric(
                                     horizontal: 18,
                                     vertical: 14,
                                   ),
@@ -201,9 +237,9 @@ class HomeScreen extends StatelessWidget {
                                   color: colorScheme.surfaceContainerLowest,
                                 ),
                               ),
-                              child: SizedBox(
+                              child: const SizedBox(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
+                                  padding: EdgeInsets.symmetric(
                                     horizontal: 18,
                                     vertical: 14,
                                   ),
@@ -227,9 +263,9 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 30),
-                      CustomSegmentedButton(),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 30),
+                      const CustomSegmentedButton(),
+                      const SizedBox(height: 15),
                     ],
                   ),
                 ),
@@ -252,23 +288,34 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                     side: BorderSide(color: colorScheme.surfaceContainerHigh),
                   ),
-                  leading: CircleAvatar(
+                  leading: const CircleAvatar(
                     radius: 24,
                     backgroundImage: AssetImage("assets/images/faces18.png"),
                   ),
-                  title: BuildText(text: "Spotify Premium", textSize: 14),
-                  subtitle: BuildText(
+                  title: const BuildText(text: "Spotify Premium", textSize: 14),
+                  subtitle: const BuildText(
                     text: "Expires in 3 days",
                     textSize: 12,
                     textClr: Colors.red,
                   ),
-                  trailing: BuildText(text: "\$9.99 / MO", textSize: 12),
+                  trailing: const BuildText(text: "\$9.99 / MO", textSize: 12),
                 ),
               );
             }),
           ),
         ],
       ),
+    );
+  }
+
+  IconButton _buildActionIcon({
+    required VoidCallback onPressed,
+    required String path,
+    required ColorScheme colorScheme,
+  }) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: customSvg(path: path, colorScheme: colorScheme),
     );
   }
 }
