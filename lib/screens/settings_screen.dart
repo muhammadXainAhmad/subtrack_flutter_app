@@ -58,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 24.0),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      fixedSize: Size(screenW * 0.5, 55),
+                      fixedSize: Size(screenW * 0.35, 55),
                       backgroundColor: colorScheme.surfaceContainerLow,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -73,6 +73,7 @@ class SettingsScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         customSvg(path: "logout", colorScheme: colorScheme),
+                        SizedBox(width: 10),
                         BuildText(
                           text: "Log Out",
                           textSize: 15,

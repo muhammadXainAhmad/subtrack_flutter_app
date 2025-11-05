@@ -71,6 +71,10 @@ flutter:
     - assets/icons/newspaper.svg
     - assets/icons/chart.svg
     - assets/icons/add.svg
+    - assets/icons/down.svg
+    - assets/icons/up.svg
+    - assets/icons/search.svg
+    - assets/icons/calender.svg
 
   fonts:
     - family: DancingScript
