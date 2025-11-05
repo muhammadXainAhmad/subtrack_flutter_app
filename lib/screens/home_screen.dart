@@ -1,68 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:subtrack/screens/create_subscription_screen.dart';
+import 'package:subtrack/screens/add_subscription_screen.dart';
 import 'package:subtrack/screens/settings_screen.dart';
+import 'package:subtrack/screens/subscription_details_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
+import 'package:subtrack/widgets/custom_bottom_navigation.dart';
 import 'package:subtrack/widgets/segmented_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        onPressed: () {},
-        backgroundColor: colorScheme.surfaceContainer,
-        child: customSvg(path: "add", colorScheme: colorScheme, width: 32),
-      ),
+      floatingActionButton: floatingButton(colorScheme, context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: NavigationBar(
-            backgroundColor: colorScheme.surfaceContainer,
-            height: 60,
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-            destinations: [
-              NavigationDestination(
-                icon: customSvg(path: "home", colorScheme: colorScheme),
-                label: "home",
-              ),
-              NavigationDestination(
-                icon: customSvg(path: "newspaper", colorScheme: colorScheme),
-                label: "newspaper",
-              ),
-              NavigationDestination(
-                icon: customSvg(path: "chart", colorScheme: colorScheme),
-                label: "chart",
-              ),
-              NavigationDestination(
-                icon: customSvg(path: "person", colorScheme: colorScheme),
-                label: "person",
-              ),
-            ],
-            selectedIndex: currentIndex,
-            onDestinationSelected: (index) {
-              setState(() {
-                currentIndex = index;
-              });
-            },
-          ),
-        ),
-      ),
+      bottomNavigationBar: CustomBottomNavigation(),
       body: CustomScrollView(
         physics: BouncingScrollPhysics(),
         slivers: [
@@ -93,18 +50,19 @@ class _HomeScreenState extends State<HomeScreen> {
             actionsPadding: EdgeInsets.only(right: 6),
             actions: [
               _buildActionIcon(
-                onPressed:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CreateSubscriptionScreen(),
-                      ),
-                    ),
+                onPressed: () {},
                 path: "history",
                 colorScheme: colorScheme,
               ),
               _buildActionIcon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SubscriptionDetailsScreen(),
+                    ),
+                  );
+                },
                 path: "notification",
                 colorScheme: colorScheme,
               ),
@@ -305,6 +263,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  FloatingActionButton floatingButton(
+    ColorScheme colorScheme,
+    BuildContext context,
+  ) {
+    return FloatingActionButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      onPressed:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddSubscriptionScreen()),
+          ),
+      backgroundColor: colorScheme.surfaceContainer,
+      child: customSvg(path: "add", colorScheme: colorScheme, width: 32),
     );
   }
 
