@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:subtrack/screens/landing_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/screens/login_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/landing_elevated_button.dart';
@@ -9,16 +10,32 @@ import 'package:subtrack/widgets/landing_animate_gradient.dart';
 import 'package:subtrack/widgets/text.dart';
 
 // COMBINE LOGIN AND SIGNUP INTO ONE & USE BOOL ISLOGIN?Combine LoginScreen & SignupScreen into 1 & use bool isLogin? (MAY OR MAY NOT)
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthenticationProvider>();
     final screenW = MediaQuery.of(context).size.width;
-    TextEditingController nameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController1 = TextEditingController();
-    TextEditingController passwordController2 = TextEditingController();
     return LandingAnimateGradient(
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -31,14 +48,7 @@ class SignupScreen extends StatelessWidget {
                 FocusScope.of(context).unfocus();
                 Future.delayed(const Duration(milliseconds: 120), () {
                   if (context.mounted) {
-                    // ******************************WILL HANDLE WITH PROVIDER********************************
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => const LandingScreen(initialPage: 2),
-                      ),
-                    );
+                    Navigator.pop(context);
                   }
                 });
               },
@@ -94,7 +104,7 @@ class SignupScreen extends StatelessWidget {
                                     CustomTextField(
                                       hintText: "Password",
                                       screenW: screenW,
-                                      controller: passwordController1,
+                                      controller: passwordController,
                                       textInputType:
                                           TextInputType.visiblePassword,
                                       isPassoword: true,
@@ -103,7 +113,7 @@ class SignupScreen extends StatelessWidget {
                                     CustomTextField(
                                       hintText: "Confirm Password",
                                       screenW: screenW,
-                                      controller: passwordController2,
+                                      controller: confirmPasswordController,
                                       textInputType:
                                           TextInputType.visiblePassword,
                                       isPassoword: true,
@@ -112,8 +122,22 @@ class SignupScreen extends StatelessWidget {
                                     LandingElevatedButton(
                                       text: "Sign Up",
                                       isFilled: true,
-                                      onPressed: () {},
+                                      showLoader: authProvider.isLoading,
                                       width: screenW,
+                                      onPressed: () async {
+                                        final success = await authProvider
+                                            .createUserWithEmailPassword(
+                                              nameController.text.trim(),
+                                              emailController.text.trim(),
+                                              passwordController.text.trim(),
+                                              confirmPasswordController.text
+                                                  .trim(),
+                                              context,
+                                            );
+                                        if (context.mounted && success) {
+                                          Navigator.of(context).pop();
+                                        }
+                                      },
                                     ),
                                     const SizedBox(height: 15),
                                     Row(
@@ -144,7 +168,9 @@ class SignupScreen extends StatelessWidget {
                                       isFilled: false,
                                       isRow: true,
                                       path: "assets/images/googleLogo.png",
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        authProvider.googleSignIn(context);
+                                      },
                                       width: screenW,
                                     ),
                                   ],
@@ -154,13 +180,15 @@ class SignupScreen extends StatelessWidget {
                             const Divider(color: whiteClr),
                             CustomTextButton(
                               text: "Already have an account? Sign in.",
-                              onPressed:
-                                  () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LoginScreen(),
-                                    ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginScreen(),
                                   ),
+                                );
+                              },
                             ),
                           ],
                         ),

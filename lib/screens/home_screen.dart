@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(width: 10),
                 BuildText(
-                  text: "Welcome Back,\nXain Ahmad!",
+                  text: "Welcome,\nXain Ahmad!",
                   textSize: 18,
                   textWeight: FontWeight.w700,
                 ),

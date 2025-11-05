@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:subtrack/widgets/text.dart';
 
 const primaryFont = "DancingScript";
 
@@ -48,6 +49,29 @@ ThemeData darkThemeData() {
     textTheme: const TextTheme(
       bodyLarge: TextStyle(fontSize: 18),
       titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    ),
+  );
+}
+
+void showSnack({
+  required String text,
+  required BuildContext context,
+  bool success = false,
+}) {
+  final colorScheme = Theme.of(context).colorScheme;
+  ScaffoldMessenger.of(context).clearSnackBars();
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: BuildText(
+        text: text,
+        textSize: 14,
+        textAlign: TextAlign.center,
+        textClr: success ? blackClr : colorScheme.onError,
+      ),
+      behavior: SnackBarBehavior.floating,
+      dismissDirection: DismissDirection.horizontal,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      backgroundColor: success ? Colors.green.shade200 : colorScheme.error,
     ),
   );
 }

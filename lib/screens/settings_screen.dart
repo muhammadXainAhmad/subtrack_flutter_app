@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
 import 'package:subtrack/widgets/custom_app_bar.dart';
@@ -13,6 +15,7 @@ class SettingsScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
+    final authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: CustomAppBar(text: "Settings"),
@@ -67,20 +70,33 @@ class SettingsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    onPressed: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        customSvg(path: "logout", colorScheme: colorScheme),
-                        SizedBox(width: 10),
-                        BuildText(
-                          text: "Log Out",
-                          textSize: 15,
-                          textWeight: FontWeight.w500,
-                        ),
-                      ],
-                    ),
+                    onPressed: () async {
+                      await authProvider.signOutUser(context);
+                    },
+                    child:
+                        authProvider.isLoading
+                            ? Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
+                                color: colorScheme.onSurface,
+                              ),
+                            )
+                            : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                customSvg(
+                                  path: "logout",
+                                  colorScheme: colorScheme,
+                                ),
+                                SizedBox(width: 10),
+                                BuildText(
+                                  text: "Log Out",
+                                  textSize: 15,
+                                  textWeight: FontWeight.w500,
+                                ),
+                              ],
+                            ),
                   ),
                 ),
               ],

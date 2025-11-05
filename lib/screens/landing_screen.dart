@@ -8,14 +8,11 @@ import 'package:subtrack/widgets/landing_animate_gradient.dart';
 import 'package:subtrack/widgets/text.dart';
 
 class LandingScreen extends StatelessWidget {
-  // ******************************WILL HANDLE WITH PROVIDER********************************
-  final int initialPage;
-  const LandingScreen({super.key,this.initialPage = 0});
+  const LandingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = PageController(initialPage: initialPage);
-
+    final controller = PageController(initialPage: 0);
     return LandingAnimateGradient(
       child: Scaffold(
         backgroundColor: transparentClr,
@@ -34,7 +31,6 @@ class LandingScreen extends StatelessWidget {
           ),
           backgroundColor: transparentClr,
           actions: [
-            // ******************************************* REMOVE WHEN ON PAGE 2 *******************************************
             Padding(
               padding: const EdgeInsets.only(right: 18.0),
               child: TextButton(

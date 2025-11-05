@@ -12,7 +12,6 @@ class LandingScreenThree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: transparentClr,
       body: Padding(
@@ -56,13 +55,12 @@ class LandingScreenThree extends StatelessWidget {
             LandingElevatedButton(
               isFilled: true,
               text: "Login",
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
-                  ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
               width: screenW,
             ),
             const SizedBox(height: 20),
@@ -71,13 +69,12 @@ class LandingScreenThree extends StatelessWidget {
             LandingElevatedButton(
               isFilled: false,
               text: "Create a new account",
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SignupScreen(),
-                    ),
-                  ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SignupScreen()),
+                );
+              },
               width: screenW,
             ),
           ],

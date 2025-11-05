@@ -4,6 +4,7 @@ import 'package:subtrack/widgets/text.dart';
 
 class LandingElevatedButton extends StatelessWidget {
   final String text;
+  final bool showLoader;
   final VoidCallback onPressed;
   final bool isFilled;
   final double width;
@@ -12,6 +13,7 @@ class LandingElevatedButton extends StatelessWidget {
 
   const LandingElevatedButton({
     super.key,
+    this.showLoader = false,
     required this.text,
     required this.onPressed,
     this.isFilled = true,
@@ -25,7 +27,7 @@ class LandingElevatedButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: isFilled ? buttonFill : Colors.transparent,
-        foregroundColor: Colors.white,
+        foregroundColor: whiteClr,
         side:
             isFilled
                 ? BorderSide.none
@@ -38,16 +40,23 @@ class LandingElevatedButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (isRow) ...[
+          if (isRow && !showLoader) ...[
             Image.asset(path!, width: 30, height: 30),
             const SizedBox(width: 10),
           ],
-          BuildText(
-            text: text,
-            textSize: 15,
-            textClr: whiteClr,
-            textWeight: FontWeight.w500,
-          ),
+          showLoader
+              ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: whiteClr,
+                ),
+              )
+              : BuildText(
+                text: text,
+                textSize: 15,
+                textClr: whiteClr,
+                textWeight: FontWeight.w500,
+              ),
         ],
       ),
     );

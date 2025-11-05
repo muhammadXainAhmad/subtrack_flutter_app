@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/screens/forgot_password_screen.dart';
-import 'package:subtrack/screens/home_screen.dart';
-import 'package:subtrack/screens/landing_screen.dart';
 import 'package:subtrack/screens/signup_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/custom_text_button.dart';
@@ -10,14 +10,28 @@ import 'package:subtrack/widgets/landing_animate_gradient.dart';
 import 'package:subtrack/widgets/landing_elevated_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthenticationProvider>();
     final screenW = MediaQuery.of(context).size.width;
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
     return LandingAnimateGradient(
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -28,16 +42,9 @@ class LoginScreen extends StatelessWidget {
             leading: IconButton(
               onPressed: () {
                 FocusScope.of(context).unfocus();
-                Future.delayed(const Duration(milliseconds: 100), () {
+                Future.delayed(const Duration(milliseconds: 120), () {
                   if (context.mounted) {
-                    // 1. Handle moving from LoginScreen to LandingThree with Provider ***********************************
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => const LandingScreen(initialPage: 2),
-                      ),
-                    );
+                    Navigator.pop(context);
                   }
                 });
               },
@@ -89,16 +96,19 @@ class LoginScreen extends StatelessWidget {
                                   LandingElevatedButton(
                                     text: "Log In",
                                     isFilled: true,
-                                    onPressed: () {
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => HomeScreen(),
-                                        ),
-                                        (route) => false,
-                                      );
-                                    },
+                                    showLoader: authProvider.isLoading,
                                     width: screenW,
+                                    onPressed: () async {
+                                      final success = await authProvider
+                                          .loginUserWithEmailPassword(
+                                            emailController.text.trim(),
+                                            passwordController.text.trim(),
+                                            context,
+                                          );
+                                      if (context.mounted && success) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
                                   ),
                                   CustomTextButton(
                                     text:
@@ -137,8 +147,15 @@ class LoginScreen extends StatelessWidget {
                                     text: "Continue with Google",
                                     isFilled: false,
                                     isRow: true,
+                                    showLoader: authProvider.isLoading,
                                     path: "assets/images/googleLogo.png",
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      final success = await authProvider
+                                          .googleSignIn(context);
+                                      if (context.mounted && success) {
+                                        Navigator.pop(context);
+                                      }
+                                    },
                                     width: screenW,
                                   ),
                                 ],
@@ -148,13 +165,15 @@ class LoginScreen extends StatelessWidget {
                           const Divider(color: whiteClr),
                           CustomTextButton(
                             text: "Don't have an account? Sign up.",
-                            onPressed:
-                                () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignupScreen(),
-                                  ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignupScreen(),
                                 ),
+                              );
+                            },
                           ),
                         ],
                       ),

@@ -16,9 +16,9 @@ class LandingScreenTwo extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 120),
+              const SizedBox(height: 70),
               GlowingCircles(screenW: screenW),
-              const SizedBox(height: 120),
+              const SizedBox(height: 70),
               const BuildText(
                 text: "Split Subscriptions\nWith Your Friends",
                 textClr: whiteClr,
