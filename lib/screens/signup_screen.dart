@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/screens/login_screen.dart';
+import 'package:subtrack/screens/phone_login_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/landing_elevated_button.dart';
 import 'package:subtrack/widgets/custom_text_button.dart';
@@ -92,7 +93,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ),
                                     const SizedBox(height: 10),
                                     CustomTextField(
-                                      hintText: "Phone number or email address",
+                                      hintText: "Email address",
                                       screenW: screenW,
                                       controller: emailController,
                                       textInputType: TextInputType.emailAddress,
@@ -135,7 +136,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                               context,
                                             );
                                         if (context.mounted && success) {
-                                          Navigator.of(context).pop();
+                                          Navigator.of(
+                                            context,
+                                          ).popUntil((route) => route.isFirst);
                                         }
                                       },
                                     ),
@@ -166,10 +169,28 @@ class _SignupScreenState extends State<SignupScreen> {
                                     LandingElevatedButton(
                                       text: "Continue with Google",
                                       isFilled: false,
-                                      isRow: true,
-                                      path: "assets/images/googleLogo.png",
+                                      isRowImage: true,
+                                      showLoaderG: authProvider.isLoading,
+                                      path: "googleLogo.png",
                                       onPressed: () {
                                         authProvider.googleSignIn(context);
+                                      },
+                                      width: screenW,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    LandingElevatedButton(
+                                      text: "Continue with Phone",
+                                      isFilled: false,
+                                      isRowImage: true,
+                                      path: "phone.png",
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => PhoneLoginScreen(),
+                                          ),
+                                        );
                                       },
                                       width: screenW,
                                     ),

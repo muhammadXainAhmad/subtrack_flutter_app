@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:subtrack/screens/otp_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 
 class AuthenticationProvider with ChangeNotifier {
@@ -80,6 +81,43 @@ class AuthenticationProvider with ChangeNotifier {
     return success;
   }
 
+  Future<bool> sendPasswordResetEmail(
+    BuildContext context,
+    String email,
+  ) async {
+    if (email.isEmpty) {
+      showSnack(text: "Please enter your email address.", context: context);
+      return false;
+    }
+    isLoading = true;
+    notifyListeners();
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      if (context.mounted) {
+        showSnack(
+          text: "Password reset email sent.",
+          context: context,
+          success: true,
+        );
+      }
+      success = true;
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.message ?? "Something went wrong.", context: context);
+        return false;
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.toString(), context: context);
+        return false;
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+    return success;
+  }
+
   Future<bool> googleSignIn(BuildContext context) async {
     const String webClientId =
         "451814373655-s3ugr590lff2jo443e71hs42kf6tpv5h.apps.googleusercontent.com";
@@ -109,13 +147,141 @@ class AuthenticationProvider with ChangeNotifier {
     return success;
   }
 
+  Future<bool> signInPhone(BuildContext context, String phoneNumber) async {
+    isLoading = true;
+    notifyListeners();
+    if (phoneNumber.isEmpty) {
+      showSnack(text: "Please enter your phone number.", context: context);
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    try {
+      _auth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential phoneAuthCredential) async {
+          await _auth.signInWithCredential(phoneAuthCredential);
+          if (context.mounted) {
+            showSnack(
+              text: "Phone automatically verified!",
+              context: context,
+              success: true,
+            );
+            Navigator.pop(context);
+          }
+        },
+        verificationFailed: (error) {
+          showSnack(text: error.message!, context: context);
+        },
+        codeSent: (verificationId, forceResendingToken) {
+          _verificationId = verificationId;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => OtpScreen(
+                        verificationId: verificationId,
+                        phoneNumber: phoneNumber,
+                      ),
+                ),
+              );
+            }
+          });
+        },
+        codeAutoRetrievalTimeout: (verificationId) {
+          _verificationId = verificationId;
+        },
+      );
+      success = true;
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.message ?? "Something went wrong.", context: context);
+        return false;
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.toString(), context: context);
+        return false;
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+    return success;
+  }
+
+  String? _verificationId;
+  Future<void> sendOtp({
+    required String phoneNumber,
+    required BuildContext context,
+  }) async {
+    isLoading = true;
+    notifyListeners();
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (_) {},
+      verificationFailed: (error) {
+        showSnack(
+          text: error.message ?? "Error sending code",
+          context: context,
+        );
+      },
+      codeSent: (verificationId, forceResendingToken) {
+        _verificationId = verificationId;
+        showSnack(text: "Code sent successfully", context: context);
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        _verificationId = verificationId;
+      },
+    );
+    isLoading = false;
+    notifyListeners();
+  }
+
+  // Verify OTP
+  Future<void> verifyOtp({
+    required String otp,
+    required BuildContext context,
+  }) async {
+    if (_verificationId == null) {
+      showSnack(text: "Verification ID missing", context: context);
+      return;
+    }
+
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: otp,
+      );
+
+      await _auth.signInWithCredential(credential);
+
+      if (context.mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnack(text: "Invalid code. Try again.", context: context);
+      }
+    }
+  }
+
+  Future<void> resendOtp({
+    required String phoneNumber,
+    required BuildContext context,
+  }) async {
+    await sendOtp(phoneNumber: phoneNumber, context: context);
+  }
+
   Future<void> signOutUser(BuildContext context) async {
     isLoading = true;
     notifyListeners();
     try {
       await _auth.signOut();
       if (context.mounted) {
-        Navigator.pop(context);
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {

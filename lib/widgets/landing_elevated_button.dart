@@ -5,20 +5,22 @@ import 'package:subtrack/widgets/text.dart';
 class LandingElevatedButton extends StatelessWidget {
   final String text;
   final bool showLoader;
+  final bool showLoaderG;
   final VoidCallback onPressed;
   final bool isFilled;
   final double width;
-  final bool isRow;
+  final bool isRowImage;
   final String? path;
 
   const LandingElevatedButton({
     super.key,
     this.showLoader = false,
+    this.showLoaderG = false,
     required this.text,
     required this.onPressed,
     this.isFilled = true,
     required this.width,
-    this.isRow = false,
+    this.isRowImage = false,
     this.path,
   });
 
@@ -40,11 +42,18 @@ class LandingElevatedButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (isRow && !showLoader) ...[
-            Image.asset(path!, width: 30, height: 30),
+          if (isRowImage && !showLoader && !showLoaderG) ...[
+            Image.asset("assets/images/$path", width: 30, height: 30),
             const SizedBox(width: 10),
           ],
           showLoader
+              ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: whiteClr,
+                ),
+              )
+              : showLoaderG
               ? Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 1.5,

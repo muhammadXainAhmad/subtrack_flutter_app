@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/custom_text_button.dart';
-import 'package:subtrack/widgets/custom_textfield.dart';
 import 'package:subtrack/widgets/landing_animate_gradient.dart';
-import 'package:subtrack/widgets/landing_elevated_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class OtpScreen extends StatefulWidget {
+  final String verificationId;
+  final String phoneNumber;
+  const OtpScreen({
+    super.key,
+    required this.verificationId,
+    required this.phoneNumber,
+  });
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  TextEditingController emailController = TextEditingController();
+class _OtpScreenState extends State<OtpScreen> {
+  final TextEditingController otpController = TextEditingController();
   @override
   void dispose() {
-    emailController.dispose();
+    otpController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthenticationProvider>();
-    final screenW = MediaQuery.of(context).size.width;
     return LandingAnimateGradient(
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -56,47 +60,34 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const BuildText(
-                                    text: "Forgot Password?",
+                                    text: "Verification",
                                     textSize: 24,
                                     textClr: whiteClr,
                                     textWeight: FontWeight.w700,
                                   ),
-                                  Image.asset(
-                                    "assets/images/forgotIllustration1.png",
-                                  ),
-                                  const BuildText(
+                                  SizedBox(height: 30),
+                                  BuildText(
                                     text:
-                                        "Dont worry! It happens. Please enter the email address associated with your account.",
+                                        "Please enter the code sent to the number\n\n${widget.phoneNumber}",
                                     textClr: whiteClr,
                                     textSize: 14,
                                     textWeight: FontWeight.w400,
                                     textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 20),
-                                  CustomTextField(
-                                    hintText: "Email address",
-                                    screenW: screenW,
-                                    controller: emailController,
-                                    textInputType: TextInputType.emailAddress,
-                                    textCapitalization: TextCapitalization.none,
-                                    isPassoword: false,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  LandingElevatedButton(
-                                    text: "Reset",
-                                    isFilled: true,
-                                    showLoader: authProvider.isLoading,
-                                    onPressed: () async {
-                                      final success = await authProvider
-                                          .sendPasswordResetEmail(
-                                            context,
-                                            emailController.text.trim(),
-                                          );
-                                      if (context.mounted && success) {
-                                        Navigator.pop(context);
-                                      }
+                                  SizedBox(height: 30),
+                                  Pinput(
+                                    length: 6,
+                                    controller: otpController,
+                                    closeKeyboardWhenCompleted: true,
+                                    defaultPinTheme: defaultPinTheme,
+                                    focusedPinTheme: focusedPinTheme,
+                                    submittedPinTheme: submittedPinTheme,
+                                    onCompleted: (pin) async {
+                                      authProvider.verifyOtp(
+                                        otp: pin,
+                                        context: context,
+                                      );
                                     },
-                                    width: screenW,
                                   ),
                                 ],
                               ),
@@ -104,8 +95,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                           const Divider(color: whiteClr),
                           CustomTextButton(
-                            text: "Didn't receive email? Resend.",
-                            onPressed: () {},
+                            text: "Didn't receive code? Resend.",
+                            onPressed: () {
+                              authProvider.signInPhone(
+                                context,
+                                widget.phoneNumber,
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -120,3 +116,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 }
+
+final defaultPinTheme = PinTheme(
+  width: 54,
+  height: 54,
+  textStyle: TextStyle(
+    fontSize: 20,
+    color: whiteClr,
+    fontWeight: FontWeight.w600,
+  ),
+  decoration: BoxDecoration(
+    border: Border.all(color: buttonBorder),
+    borderRadius: BorderRadius.circular(20),
+  ),
+);
+
+final focusedPinTheme = defaultPinTheme.copyDecorationWith(
+  border: Border.all(color: whiteClr),
+  borderRadius: BorderRadius.circular(8),
+);
+
+final submittedPinTheme = defaultPinTheme.copyWith(
+  decoration: defaultPinTheme.decoration!.copyWith(color: buttonFill),
+);
