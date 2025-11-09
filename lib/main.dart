@@ -5,6 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/firebase_options.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
+import 'package:subtrack/providers/subscription_provider.dart';
+import 'package:subtrack/providers/user_provider.dart';
 import 'package:subtrack/screens/home_screen.dart';
 import 'package:subtrack/screens/landing_screen.dart';
 import 'package:subtrack/utils/utils.dart';
@@ -13,10 +15,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // uploadSubscriptionData();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthenticationProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => SubscriptionProvider()),
       ],
       child: const MyApp(),
     ),
@@ -42,7 +47,10 @@ class MyApp extends StatelessWidget {
             );
           }
           if (snapshot.hasData) {
-            return const HomeScreen();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<UserProvider>().refreshUser();
+            });
+            return HomeScreen();
           } else {
             return const LandingScreen();
           }

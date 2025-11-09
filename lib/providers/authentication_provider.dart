@@ -1,22 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:subtrack/models/user_model.dart';
 import 'package:subtrack/screens/otp_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 
 class AuthenticationProvider with ChangeNotifier {
   final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
   bool isLoading = false;
   bool success = false;
 
   Future<bool> createUserWithEmailPassword(
-    String fullname,
+    String fullName,
     String email,
     String password,
     String confirmPassword,
     BuildContext context,
   ) async {
-    if (fullname.isEmpty ||
+    if (fullName.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
@@ -30,11 +33,15 @@ class AuthenticationProvider with ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
       success = true;
+      UserModel user = UserModel(
+        uid: userCredential.user!.uid,
+        email: email,
+        fullName: fullName,
+      );
+      _firestore.collection("users").doc(user.uid).set(user.toMap());
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
         showSnack(text: e.message ?? "Something went wrong.", context: context);
