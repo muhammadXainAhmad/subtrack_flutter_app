@@ -108,7 +108,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                     }
                                   },
                                   title: "Payment Mode",
-                                  items: paymentModes,
+                                  items: subProvider.paymentModes,
                                   path1: "down",
                                   path2: "up",
                                 ),
@@ -123,7 +123,16 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                       subProvider.selectedSubscription == null,
                                   child: GestureDetector(
                                     onTap: () async {
-                                      await subProvider.selectDate(context);
+                                      final DateTime? pickedDate =
+                                          await showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2020),
+                                            lastDate: DateTime(2050),
+                                          );
+                                      if (pickedDate != null) {
+                                        subProvider.selectDate(pickedDate);
+                                      }
                                     },
                                     child: Opacity(
                                       opacity:
@@ -231,7 +240,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                     }
                                   },
                                   title: "Notification Alert",
-                                  items: alerts,
+                                  items: subProvider.notificationAlerts,
                                   path1: "down",
                                   path2: "up",
                                 ),
@@ -240,6 +249,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                           ),
                         ),
                       ),
+                   
                       const SizedBox(height: 15),
                       CustomElevatedButton(
                         screenW: screenW * 1.05,
@@ -285,10 +295,3 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     );
   }
 }
-
-final List<String> paymentModes = [
-  "Credit Card",
-  "Debit Card",
-  "Mobile Wallets",
-];
-final List<String> alerts = ["1 Day Before", "3 Days Before", "1 Week Before"];

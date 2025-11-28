@@ -1,33 +1,46 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:subtrack/models/plan_model.dart';
 import 'package:subtrack/models/subscription_model.dart';
 import 'package:subtrack/utils/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class SubscriptionProvider with ChangeNotifier {
+  SubscriptionProvider() {
+    fetchActiveSubNumbers();
+  }
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   List<String> _subscriptionNames = [];
   List<PlanModel> _plans = [];
   List<String> _billingCycle = [];
+  List<String> _paymentModes = [];
+  List<String> _notificationAlerts = [];
   String? _selectedSubscription;
   PlanModel? _selectedPlan;
   String? _selectedPayment;
   String? _selectedBillingCycle;
   DateTime? _selectedDate;
   String? _selectedNotification;
+  int? _subCount;
 
   List<String> get subscriptionNames => _subscriptionNames;
   List<PlanModel> get plans => _plans;
   List<String> get billingCycle => _billingCycle;
+  List<String> get paymentModes => _paymentModes;
+  List<String> get notificationAlerts => _notificationAlerts;
   String? get selectedSubscription => _selectedSubscription;
   PlanModel? get selectedPlan => _selectedPlan;
   String? get selectedPayment => _selectedPayment;
   String? get selectedBillingCycle => _selectedBillingCycle;
   DateTime? get selectedDate => _selectedDate;
   String? get selectedNotification => _selectedNotification;
+  int? get subCount => _subCount;
 
   Future<void> fetchSubscriptionNames() async {
     try {
@@ -37,6 +50,26 @@ class SubscriptionProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       if (kDebugMode) print("Error fetching subscription names: $e");
+    }
+  }
+
+  Future<void> fetchPaymentModes() async {
+    try {
+      final snapshot = await _firestore.collection("paymentModes").get();
+      _paymentModes =
+          snapshot.docs.map((doc) => doc["label"] as String).toList();
+    } catch (e) {
+      if (kDebugMode) print("Error fetching payment modes: $e");
+    }
+  }
+
+  Future<void> fetchNotificationAlerts() async {
+    try {
+      final snapshot = await _firestore.collection("notificationAlerts").get();
+      _notificationAlerts =
+          snapshot.docs.map((doc) => doc["label"] as String).toList();
+    } catch (e) {
+      if (kDebugMode) print("Error fetching notification alerts: $e");
     }
   }
 
@@ -74,6 +107,8 @@ class SubscriptionProvider with ChangeNotifier {
           final plansList = data["plans"] as List<dynamic>;
           _plans = plansList.map((p) => PlanModel.fromMap(p)).toList();
         }
+        fetchPaymentModes();
+        fetchNotificationAlerts();
       }
     } catch (e) {
       if (kDebugMode) {
@@ -98,23 +133,33 @@ class SubscriptionProvider with ChangeNotifier {
 
   void selectPayment(String selectedPaymentMode) {
     _selectedPayment = selectedPaymentMode;
+    notifyListeners();
   }
 
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2050),
-    );
-    if (pickedDate != null && pickedDate != _selectedDate) {
-      _selectedDate = pickedDate;
-      notifyListeners();
-    }
+  Future<void> selectDate(DateTime pickedDate) async {
+    _selectedDate = pickedDate;
+    notifyListeners();
   }
 
   void selectNotificaition(String selectedNotificationAlert) {
     _selectedNotification = selectedNotificationAlert;
+  }
+
+  Future<void> fetchActiveSubNumbers() async {
+    final uid = _auth.currentUser!.uid;
+    try {
+      final snapshot =
+          await _firestore
+              .collection("users")
+              .doc(uid)
+              .collection("users_subscriptions")
+              .get();
+      _subCount = snapshot.docs.length;
+      notifyListeners();
+    } catch (e) {
+      if (kDebugMode) print("Error counting subscriptions: $e");
+    }
+    notifyListeners();
   }
 
   bool success = false;
@@ -133,13 +178,36 @@ class SubscriptionProvider with ChangeNotifier {
     notifyListeners();
     try {
       final String subscriptionId = Uuid().v1();
+
+      // Calculate next payment date
+      DateTime? nextPaymentDate;
+      if (plan.billingCycle == "Monthly") {
+        nextPaymentDate = paymentDate.add(Duration(days: 30));
+      } else if (plan.billingCycle == "Yearly") {
+        nextPaymentDate = paymentDate.add(Duration(days: 365));
+      }
+
+      // Fetch icon URL from main subscription collection
+      final snap =
+          await _firestore
+              .collection("subscriptions")
+              .doc(subscriptionName.toLowerCase().replaceAll(" ", "_"))
+              .get();
+      final iconUrl = snap["iconUrl"];
+      final webUrl = snap["website"];
+
       final subscription = SubscriptionModel(
         subscriptionId: subscriptionId,
         subscriptionName: subscriptionName,
         paymentMode: paymentMode,
         paymentDate: paymentDate,
+        nextPaymentDate: nextPaymentDate!,
         notificationAlert: notificationAlert,
         plan: plan,
+        iconUrl: iconUrl,
+        webUrl: webUrl,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
       await FirebaseFirestore.instance
           .collection("users")
@@ -170,5 +238,12 @@ class SubscriptionProvider with ChangeNotifier {
       notifyListeners();
     }
     return success;
+  }
+
+  Future<void> openLink(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }

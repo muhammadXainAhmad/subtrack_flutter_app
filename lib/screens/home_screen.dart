@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/providers/user_provider.dart';
 import 'package:subtrack/screens/add_subscription_screen.dart';
 import 'package:subtrack/screens/settings_screen.dart';
@@ -16,6 +19,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().getUser;
+    final subProvider = context.watch<SubscriptionProvider>();
     final colorScheme = Theme.of(context).colorScheme;
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
@@ -67,14 +71,7 @@ class HomeScreen extends StatelessWidget {
                     colorScheme: colorScheme,
                   ),
                   _buildActionIcon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubscriptionDetailsScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: () {},
                     path: "notification",
                     colorScheme: colorScheme,
                   ),
@@ -212,7 +209,7 @@ class HomeScreen extends StatelessWidget {
                                       color: colorScheme.surfaceContainerLowest,
                                     ),
                                   ),
-                                  child: const SizedBox(
+                                  child: SizedBox(
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 18,
@@ -220,13 +217,14 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                       child: Column(
                                         children: [
-                                          BuildText(
+                                          const BuildText(
                                             text: "Active Subs",
                                             textSize: 14,
                                             textWeight: FontWeight.w500,
                                           ),
                                           BuildText(
-                                            text: "10",
+                                            text:
+                                                subProvider.subCount.toString(),
                                             textSize: 26,
                                             textWeight: FontWeight.w500,
                                           ),
@@ -247,46 +245,103 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(childCount: 10, (
-                  context,
-                  index,
-                ) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 10,
-                    ),
-                    child: ListTile(
-                      tileColor: colorScheme.surface,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        side: BorderSide(
-                          color: colorScheme.surfaceContainerHigh,
+              SliverToBoxAdapter(
+                child: StreamBuilder(
+                  stream:
+                      FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("users_subscriptions")
+                          .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 140),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: colorScheme.onSurface,
+                            strokeWidth: 1.5,
+                          ),
                         ),
-                      ),
-                      leading: const CircleAvatar(
-                        radius: 24,
-                        backgroundImage: AssetImage(
-                          "assets/images/faces18.png",
+                      );
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 140),
+                        child: Center(
+                          child: BuildText(
+                            text: "No subscriptions added yet",
+                            textSize: 14,
+                            textClr: Colors.grey,
+                          ),
                         ),
-                      ),
-                      title: const BuildText(
-                        text: "Spotify Premium",
-                        textSize: 14,
-                      ),
-                      subtitle: const BuildText(
-                        text: "Expires in 3 days",
-                        textSize: 12,
-                        textClr: Colors.red,
-                      ),
-                      trailing: const BuildText(
-                        text: "\$9.99 / MO",
-                        textSize: 12,
-                      ),
-                    ),
-                  );
-                }),
+                      );
+                    }
+                    final subs = snapshot.data!.docs;
+                    return Column(
+                      children: List.generate(subs.length, (index) {
+                        final data = subs[index].data();
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 10,
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(30),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => SubscriptionDetailsScreen(
+                                        subscriptionData: data,
+                                      ),
+                                ),
+                              );
+                            },
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              tileColor: colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                side: BorderSide(
+                                  color: colorScheme.surfaceContainerHigh,
+                                ),
+                              ),
+                              leading: CircleAvatar(
+                                radius: 24,
+                                backgroundColor: whiteClr,
+                                child: ClipOval(
+                                  child: Image.network(
+                                    data["iconUrl"],
+                                    width: 64,
+                                    height: 64,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                              title: BuildText(
+                                text: data["subscriptionName"],
+                                textSize: 14,
+                              ),
+                              subtitle: BuildText(
+                                text: "${data["plan"]["name"]} Plan",
+                                textSize: 12,
+                              ),
+                              trailing: BuildText(
+                                text:
+                                    "${data["plan"]["currency"]}${data["plan"]["price"]} / ${data["plan"]["billingCycle"]}",
+                                textSize: 12,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    );
+                  },
+                ),
               ),
             ],
           ),

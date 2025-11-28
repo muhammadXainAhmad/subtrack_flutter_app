@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:subtrack/providers/subscription_provider.dart';
+import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
 import 'package:subtrack/widgets/custom_app_bar.dart';
 import 'package:subtrack/widgets/custom_elevated_button.dart';
 import 'package:subtrack/widgets/text.dart';
+import 'package:intl/intl.dart';
 
 class SubscriptionDetailsScreen extends StatelessWidget {
-  const SubscriptionDetailsScreen({super.key});
+  final Map<String, dynamic> subscriptionData;
+  const SubscriptionDetailsScreen({super.key, required this.subscriptionData});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
+    final renewalDays =
+        subscriptionData["nextPaymentDate"]
+            .toDate()
+            .difference(subscriptionData["paymentDate"].toDate())
+            .inDays;
     return Scaffold(
       appBar: CustomAppBar(text: "Subscription Details"),
       body: Stack(
@@ -27,29 +37,45 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 32,
-                      backgroundImage: AssetImage("assets/images/faces18.png"),
+                      backgroundColor: whiteClr,
+                      child: ClipOval(
+                        child: Image.network(
+                          subscriptionData["iconUrl"],
+                          width: 64,
+                          height: 64,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
-                    SizedBox(width: 15),
+                    const SizedBox(width: 15),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          BuildText(text: "Spotify Premium", textSize: 18),
-                          BuildText(
-                            text: "Expires in 3 days",
-                            textSize: 12,
-                            textClr: Colors.red,
-                          ),
-                          Text(
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            "Spotify Premium is a paid subscription plan that offers an enhanced music streaming experience without ads. It allows users to download songs for offline listening, enjoy unlimited skips, and stream in high-quality audio. Premium users can also play any track on demand and access exclusive features across all their devices.",
-                            style: TextStyle(
-                              color: colorScheme.onSurface,
-                              fontSize: 14,
+                          GestureDetector(
+                            onTap: () async{
+                              final provider =
+                                  context.read<SubscriptionProvider>();
+                              await provider.openLink(subscriptionData["webUrl"]);
+                            },
+                            child: BuildText(
+                              text: subscriptionData["subscriptionName"],
+                              textSize: 18,
+                              textWeight: FontWeight.w900,
                             ),
                           ),
-                          SizedBox(height: 30),
+                          BuildText(
+                            text:
+                                renewalDays > 7
+                                    ? "Renewal on ${DateFormat("dd MMM yyyy").format(subscriptionData["nextPaymentDate"].toDate())}"
+                                    : "Expires in $renewalDays days",
+                            textSize: 12,
+                            textClr:
+                                renewalDays > 7
+                                    ? colorScheme.onSurface
+                                    : Colors.red,
+                          ),
+                          const SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -58,10 +84,18 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    BuildText(text: "Subscription Details", textSize: 16),
+                    BuildText(
+                      text: "Subscription Details",
+                      textSize: 16,
+                      textWeight: FontWeight.w600,
+                    ),
                     TextButton(
                       onPressed: () {},
-                      child: BuildText(text: "Edit", textSize: 16),
+                      child: BuildText(
+                        text: "Edit",
+                        textSize: 16,
+                        textWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -82,20 +116,39 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                       children: [
                         detailsRow(
                           title: "Subscription Plan",
-                          detail: "Essentials Plan - \$9.99",
+                          detail: "${subscriptionData["plan"]["name"]}",
                         ),
                         detailsRow(
-                          title: "Subscription On",
-                          detail: "04th Nov 2025",
+                          title: "Subscription Price",
+                          detail:
+                              " ${subscriptionData["plan"]["currency"]}${subscriptionData["plan"]["price"]}",
+                        ),
+                        detailsRow(
+                          title: "Renewal Date",
+                          detail: DateFormat("dd MMM yyyy").format(
+                            subscriptionData["nextPaymentDate"].toDate(),
+                          ),
+                        ),
+                        detailsRow(
+                          title: "Last Payment Date",
+                          detail:
+                              DateFormat("dd MMM yyyy")
+                                  .format(
+                                    subscriptionData["paymentDate"].toDate(),
+                                  )
+                                  .toString(),
                         ),
                         detailsRow(
                           title: "Payment Mode",
-                          detail: "Auto-Renewal",
+                          detail: subscriptionData["paymentMode"],
                         ),
-                        detailsRow(title: "Billing Cycle", detail: "Monthly"),
                         detailsRow(
-                          title: "Notifications",
-                          detail: "2 days before",
+                          title: "Billing Cycle",
+                          detail: subscriptionData["plan"]["billingCycle"],
+                        ),
+                        detailsRow(
+                          title: "Notification Alert",
+                          detail: subscriptionData["notificationAlert"],
                         ),
                       ],
                     ),

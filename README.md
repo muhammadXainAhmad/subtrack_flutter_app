@@ -1,16 +1,30 @@
-# subtrack
+1. Handle moving from LoginScreen to LandingThree with Provider
+2. SegmentedButton implementation - convert from stf to stl with provider
+3. COMBINE LOGIN AND SIGNUP INTO ONE & USE BOOL ISLOGIN?Combine LoginScreen & SignupScreen into 1 & use bool isLogin? (MAY OR MAY NOT)
 
-A new Flutter project.
 
-## Getting Started
+{
+  "subscriptionId": "abc123",
+  "subscriptionName": "Netflix",
+  "category": "entertainment",
+  "paymentMode": "credit_card",
 
-This project is a starting point for a Flutter application.
+  "plan": {
+    "planName": "Premium",
+    "price": 2500,
+    "currency": "PKR",
+    "billingCycle": "monthly"
+  },
 
-A few resources to get you started if this is your first Flutter project:
+  "paymentDate": "2025-01-01T00:00:00",
+  "nextRenewalDate": "2025-02-01T00:00:00",
+  "notificationAlert": 3,
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+  "autoRenew": true,
+  "status": "active",
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  "notes": "",
+  
+  "createdAt": "2025-01-01T00:00:00",
+  "updatedAt": "2025-01-01T00:00:00"
+}
