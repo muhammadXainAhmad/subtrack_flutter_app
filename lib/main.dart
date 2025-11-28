@@ -16,6 +16,7 @@ void main() async {
   await dotenv.load(fileName: "assets/.env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // uploadSubscriptionData();
+  // updateSubscriptionIcons();
   runApp(
     MultiProvider(
       providers: [

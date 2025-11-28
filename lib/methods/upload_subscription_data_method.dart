@@ -7,7 +7,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "Netflix",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/512px-Netflix_2015_logo.svg.png",
       "category": "Entertainment",
       "website": "https://www.netflix.com",
       "plans": [
@@ -40,7 +40,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "Spotify",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/250px-Spotify_logo_without_text.svg.png",
       "category": "Music",
       "website": "https://www.spotify.com",
       "plans": [
@@ -73,7 +73,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "YouTube Premium",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png",
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbp_NWLckKr9VPB180t8lPqVv0XAUR88na1g&s",
       "category": "Entertainment",
       "website": "https://www.youtube.com/premium",
       "plans": [
@@ -100,7 +100,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "ChatGPT Plus",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+          "https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg",
       "category": "Productivity",
       "website": "https://chat.openai.com",
       "plans": [
@@ -115,7 +115,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "Disney+",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Disney%2B_logo.svg/250px-Disney%2B_logo.svg.png",
       "category": "Entertainment",
       "website": "https://www.disneyplus.com",
       "plans": [
@@ -157,7 +157,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "HBO Max",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/1/17/HBO_Max_Logo.svg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/HBO_Max_Logo.svg/512px-HBO_Max_Logo.svg.png",
       "category": "Entertainment",
       "website": "https://www.hbomax.com",
       "plans": [
@@ -184,7 +184,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "Apple Music",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/d/df/Apple_Music_logo.svg",
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-SIOh8VlhZgdD5l2irbSJKz8DPMUTfIGM8A&s",
       "category": "Music",
       "website": "https://www.music.apple.com",
       "plans": [
@@ -211,7 +211,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "Adobe Creative Cloud",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/5/5f/Adobe_Creative_Cloud_rainbow_icon.svg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Adobe_Creative_Cloud_rainbow_icon.svg/250px-Adobe_Creative_Cloud_rainbow_icon.svg.png",
       "category": "Productivity",
       "website": "https://www.adobe.com/creativecloud.html",
       "plans": [
@@ -238,7 +238,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "Canva Pro",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/0/08/Canva_icon_2021.svg",
+          "https://1000logos.net/wp-content/uploads/2020/03/Canva-icon.png",
       "category": "Productivity",
       "website": "https://www.canva.com",
       "plans": [
@@ -259,7 +259,7 @@ Future<void> uploadSubscriptionData() async {
     {
       "name": "Microsoft 365",
       "iconUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
+          "https://cdn-icons-png.flaticon.com/512/732/732222.png",
       "category": "Productivity",
       "website": "https://www.microsoft.com/microsoft-365",
       "plans": [
@@ -319,5 +319,54 @@ Future<void> uploadSubscriptionData() async {
 
   if (kDebugMode) {
     print("✅ Firestore seeding complete!");
+  }
+}
+
+
+Future<void> updateSubscriptionIcons() async {
+  final firestore = FirebaseFirestore.instance;
+
+  // Map of subscription names to their new icon URLs
+  final Map<String, String> iconUpdates = {
+    "Netflix":
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/512px-Netflix_2015_logo.svg.png",
+    "Spotify":
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/250px-Spotify_logo_without_text.svg.png",
+    "YouTube Premium":
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbp_NWLckKr9VPB180t8lPqVv0XAUR88na1g&s",
+    "ChatGPT Plus":
+        "https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg",
+    "Disney+":
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Disney%2B_logo.svg/250px-Disney%2B_logo.svg.png",
+    "Amazon Prime Video":
+        "https://upload.wikimedia.org/wikipedia/commons/f/f1/Prime_Video.png",
+    "HBO Max":
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/HBO_Max_Logo.svg/512px-HBO_Max_Logo.svg.png",
+    "Apple Music":
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-SIOh8VlhZgdD5l2irbSJKz8DPMUTfIGM8A&s",
+    "Adobe Creative Cloud":
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Adobe_Creative_Cloud_rainbow_icon.svg/250px-Adobe_Creative_Cloud_rainbow_icon.svg.png",
+    "Canva Pro":
+        "https://1000logos.net/wp-content/uploads/2020/03/Canva-icon.png",
+    "Microsoft 365":
+        "https://cdn-icons-png.flaticon.com/512/732/732222.png",
+  };
+
+  for (final entry in iconUpdates.entries) {
+    final docId = entry.key.toLowerCase().replaceAll(' ', '_');
+
+    try {
+      await firestore
+          .collection('subscriptions')
+          .doc(docId)
+          .update({"iconUrl": entry.value});
+      if (kDebugMode) {
+        print("✅ Updated iconUrl for ${entry.key}");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("❌ Failed to update ${entry.key}: $e");
+      }
+    }
   }
 }
