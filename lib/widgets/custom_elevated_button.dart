@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/text.dart';
 
 class CustomElevatedButton extends StatelessWidget {
@@ -8,12 +9,14 @@ class CustomElevatedButton extends StatelessWidget {
     required this.colorScheme,
     required this.text,
     required this.onPressed,
+    this.showLoader = false,
   });
 
   final double screenW;
   final ColorScheme colorScheme;
   final String text;
   final VoidCallback onPressed;
+  final bool showLoader;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,19 @@ class CustomElevatedButton extends StatelessWidget {
         ),
       ),
       onPressed: onPressed,
-      child: BuildText(text: text, textSize: 15, textWeight: FontWeight.w500),
+      child:
+          showLoader
+              ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: whiteClr,
+                ),
+              )
+              : BuildText(
+                text: text,
+                textSize: 15,
+                textWeight: FontWeight.w500,
+              ),
     );
   }
 }

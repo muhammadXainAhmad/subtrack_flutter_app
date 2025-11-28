@@ -19,6 +19,15 @@ class PlanModel {
       billingCycle: map['billingCycle'] as String,
     );
   }
+  
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'billingCycle': billingCycle,
+      'price': price,
+      'currency': currency,
+    };
+  }
 
   @override
   String toString() => "$name - $price $currency";

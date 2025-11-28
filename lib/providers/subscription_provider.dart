@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:subtrack/models/plan_model.dart';
+import 'package:subtrack/models/subscription_model.dart';
+import 'package:subtrack/utils/utils.dart';
+import 'package:uuid/uuid.dart';
 
 class SubscriptionProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -11,16 +14,20 @@ class SubscriptionProvider with ChangeNotifier {
   List<String> _billingCycle = [];
   String? _selectedSubscription;
   PlanModel? _selectedPlan;
+  String? _selectedPayment;
   String? _selectedBillingCycle;
   DateTime? _selectedDate;
+  String? _selectedNotification;
 
   List<String> get subscriptionNames => _subscriptionNames;
   List<PlanModel> get plans => _plans;
   List<String> get billingCycle => _billingCycle;
   String? get selectedSubscription => _selectedSubscription;
   PlanModel? get selectedPlan => _selectedPlan;
+  String? get selectedPayment => _selectedPayment;
   String? get selectedBillingCycle => _selectedBillingCycle;
   DateTime? get selectedDate => _selectedDate;
+  String? get selectedNotification => _selectedNotification;
 
   Future<void> fetchSubscriptionNames() async {
     try {
@@ -31,6 +38,20 @@ class SubscriptionProvider with ChangeNotifier {
     } catch (e) {
       if (kDebugMode) print("Error fetching subscription names: $e");
     }
+  }
+
+  void reset() {
+    _selectedSubscription = null;
+    _selectedPlan = null;
+    _selectedPayment = null;
+    _selectedBillingCycle = null;
+    _selectedDate = null;
+    _selectedNotification = null;
+
+    _plans = [];
+    _billingCycle = [];
+
+    notifyListeners();
   }
 
   Future<void> selectSubscription(String? subscriptionName) async {
@@ -75,6 +96,10 @@ class SubscriptionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void selectPayment(String selectedPaymentMode) {
+    _selectedPayment = selectedPaymentMode;
+  }
+
   Future<void> selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -86,5 +111,64 @@ class SubscriptionProvider with ChangeNotifier {
       _selectedDate = pickedDate;
       notifyListeners();
     }
+  }
+
+  void selectNotificaition(String selectedNotificationAlert) {
+    _selectedNotification = selectedNotificationAlert;
+  }
+
+  bool success = false;
+  bool isLoading = false;
+
+  Future<bool> addSubscription({
+    required BuildContext context,
+    required String currentUserId,
+    required String subscriptionName,
+    required String paymentMode,
+    required DateTime paymentDate,
+    required String notificationAlert,
+    required PlanModel plan,
+  }) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      final String subscriptionId = Uuid().v1();
+      final subscription = SubscriptionModel(
+        subscriptionId: subscriptionId,
+        subscriptionName: subscriptionName,
+        paymentMode: paymentMode,
+        paymentDate: paymentDate,
+        notificationAlert: notificationAlert,
+        plan: plan,
+      );
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUserId)
+          .collection("users_subscriptions")
+          .doc(subscriptionId)
+          .set(subscription.toMap());
+      success = true;
+      if (context.mounted) {
+        showSnack(
+          text: "Subscription successfully added!",
+          context: context,
+          success: true,
+        );
+      }
+    } on FirebaseException catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.message ?? "Something went wrong.", context: context);
+        return false;
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.toString(), context: context);
+        return false;
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+    return success;
   }
 }
