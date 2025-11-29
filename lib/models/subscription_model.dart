@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:subtrack/models/plan_model.dart';
 
 class SubscriptionModel {
@@ -32,14 +33,14 @@ class SubscriptionModel {
       subscriptionId: map["subscriptionId"] as String,
       subscriptionName: map['subscriptionName'] as String,
       paymentMode: map['paymentMode'] as String,
-      paymentDate: map['paymentDate'] as DateTime,
-      nextPaymentDate: map['nextPaymentDate'] as DateTime,
+      paymentDate: (map['paymentDate'] as Timestamp).toDate(),
+      nextPaymentDate: (map['nextPaymentDate'] as Timestamp).toDate(),
       notificationAlert: map['notificationAlert'] as String,
       plan: PlanModel.fromMap(map["plan"]),
       iconUrl: map['iconUrl'] as String,
-       webUrl: map['webUrl'] as String,
-      createdAt: map['createdAt'] as DateTime,
-      updatedAt: map['updatedAt'] as DateTime,
+      webUrl: map['webUrl'] as String,
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
     );
   }
 
@@ -53,7 +54,7 @@ class SubscriptionModel {
       'notificationAlert': notificationAlert,
       'plan': plan.toMap(),
       'iconUrl': iconUrl,
-      'webUrl':webUrl,
+      'webUrl': webUrl,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

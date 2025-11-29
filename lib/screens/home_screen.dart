@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:subtrack/models/subscription_model.dart';
+import 'package:subtrack/providers/segmented_btn_provider.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/providers/user_provider.dart';
-import 'package:subtrack/screens/add_subscription_screen.dart';
 import 'package:subtrack/screens/settings_screen.dart';
 import 'package:subtrack/screens/subscription_details_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
-import 'package:subtrack/widgets/custom_bottom_navigation.dart';
 import 'package:subtrack/widgets/segmented_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
@@ -20,6 +21,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().getUser;
     final subProvider = context.watch<SubscriptionProvider>();
+    final segmentedBtnProvider = context.watch<SegmentedBtnProvider>();
     final colorScheme = Theme.of(context).colorScheme;
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
@@ -33,10 +35,6 @@ class HomeScreen extends StatelessWidget {
           ),
         )
         : Scaffold(
-          floatingActionButton: floatingButton(colorScheme, context),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          bottomNavigationBar: CustomBottomNavigation(),
           body: CustomScrollView(
             physics: BouncingScrollPhysics(),
             slivers: [
@@ -280,7 +278,14 @@ class HomeScreen extends StatelessWidget {
                     final subs = snapshot.data!.docs;
                     return Column(
                       children: List.generate(subs.length, (index) {
-                        final data = subs[index].data();
+                        final dataMap = subs[index].data();
+                        final subscriptionData = SubscriptionModel.fromMap(
+                          dataMap,
+                        );
+                        final renewalDays =
+                            subscriptionData.nextPaymentDate
+                                .difference(subscriptionData.paymentDate)
+                                .inDays;
                         return Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 18,
@@ -294,7 +299,7 @@ class HomeScreen extends StatelessWidget {
                                 MaterialPageRoute(
                                   builder:
                                       (context) => SubscriptionDetailsScreen(
-                                        subscriptionData: data,
+                                        subscriptionData: subscriptionData,
                                       ),
                                 ),
                               );
@@ -315,7 +320,7 @@ class HomeScreen extends StatelessWidget {
                                 backgroundColor: whiteClr,
                                 child: ClipOval(
                                   child: Image.network(
-                                    data["iconUrl"],
+                                    subscriptionData.iconUrl,
                                     width: 64,
                                     height: 64,
                                     fit: BoxFit.contain,
@@ -323,16 +328,22 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ),
                               title: BuildText(
-                                text: data["subscriptionName"],
+                                text: subscriptionData.subscriptionName,
                                 textSize: 14,
                               ),
                               subtitle: BuildText(
-                                text: "${data["plan"]["name"]} Plan",
+                                text:
+                                    segmentedBtnProvider.selected ==
+                                            "yourSubscriptions"
+                                        ? "${subscriptionData.plan.name} Plan"
+                                        : renewalDays > 7
+                                        ? "Renewal on ${DateFormat("dd MMM yyyy").format(subscriptionData.nextPaymentDate)}"
+                                        : "Expires in $renewalDays days",
                                 textSize: 12,
                               ),
                               trailing: BuildText(
                                 text:
-                                    "${data["plan"]["currency"]}${data["plan"]["price"]} / ${data["plan"]["billingCycle"]}",
+                                    "${subscriptionData.plan.currency}${subscriptionData.plan.price} / ${subscriptionData.plan.billingCycle.toString().substring(0, 2).toUpperCase()}",
                                 textSize: 12,
                               ),
                             ),
@@ -346,22 +357,6 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         );
-  }
-
-  FloatingActionButton floatingButton(
-    ColorScheme colorScheme,
-    BuildContext context,
-  ) {
-    return FloatingActionButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      onPressed:
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddSubscriptionScreen()),
-          ),
-      backgroundColor: colorScheme.surfaceContainer,
-      child: customSvg(path: "add", colorScheme: colorScheme, width: 32),
-    );
   }
 
   IconButton _buildActionIcon({

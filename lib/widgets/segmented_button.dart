@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:subtrack/providers/segmented_btn_provider.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/text.dart';
 
@@ -10,7 +12,6 @@ class CustomSegmentedButton extends StatefulWidget {
 }
 
 class _CustomSegmentedButtonState extends State<CustomSegmentedButton> {
-  //****************************************CONVERT TO PROVIDER ****************************
   Set<String> selected = {"yourSubscriptions"};
 
   void updatedSelected(Set<String> newSelection) {
@@ -22,7 +23,8 @@ class _CustomSegmentedButtonState extends State<CustomSegmentedButton> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
+    final segmentedProvider = context.watch<SegmentedBtnProvider>();
+    final selected = segmentedProvider.selected;
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
@@ -46,7 +48,8 @@ class _CustomSegmentedButtonState extends State<CustomSegmentedButton> {
                   selected.contains("yourSubscriptions")
                       ? {"yourSubscriptions"}
                       : {},
-              onSelectionChanged: (_) => updatedSelected({"yourSubscriptions"}),
+              onSelectionChanged:
+                  (_) => segmentedProvider.select("yourSubscriptions"),
               style: SegmentedButton.styleFrom(
                 selectedBackgroundColor:
                     selected.contains("yourSubscriptions")
@@ -59,7 +62,7 @@ class _CustomSegmentedButtonState extends State<CustomSegmentedButton> {
               ),
             ),
           ),
-          const SizedBox(width: 10), // 👈 creates visual separation
+          const SizedBox(width: 10),
           Expanded(
             child: SegmentedButton(
               emptySelectionAllowed: true,
@@ -72,7 +75,8 @@ class _CustomSegmentedButtonState extends State<CustomSegmentedButton> {
               ],
               selected:
                   selected.contains("upcomingDues") ? {"upcomingDues"} : {},
-              onSelectionChanged: (_) => updatedSelected({"upcomingDues"}),
+              onSelectionChanged:
+                  (_) => segmentedProvider.select("upcomingDues"),
               style: SegmentedButton.styleFrom(
                 selectedBackgroundColor:
                     selected.contains("upcomingDues")

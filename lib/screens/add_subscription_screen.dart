@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:subtrack/models/subscription_model.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/add_subscription_dropdown.dart';
@@ -11,7 +12,9 @@ import 'package:subtrack/widgets/custom_elevated_button.dart';
 import 'package:subtrack/widgets/text.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
-  const AddSubscriptionScreen({super.key});
+  final bool isEdit;
+  final SubscriptionModel? editData;
+  const AddSubscriptionScreen({super.key, this.isEdit = false, this.editData});
 
   @override
   State<AddSubscriptionScreen> createState() => _AddSubscriptionScreenState();
@@ -23,7 +26,11 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     super.initState();
     Future.microtask(() {
       if (mounted) {
+        final provider = context.read<SubscriptionProvider>();
         context.read<SubscriptionProvider>().fetchSubscriptionNames();
+        if (widget.isEdit && widget.editData != null) {
+          provider.loadEditSubscriptionData(widget.editData!);
+        }
       }
     });
   }
@@ -42,7 +49,12 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
           backgroundColor: colorScheme.surface,
-          appBar: CustomAppBar(text: "Add a Subscription"),
+          appBar: CustomAppBar(
+            text:
+                widget.isEdit
+                    ? "Edit Existing Subscription"
+                    : "Add New Subscription",
+          ),
           body: SafeArea(
             child: SingleChildScrollView(
               child: Stack(
@@ -72,7 +84,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                   items: subProvider.subscriptionNames,
                                   selectedItem:
                                       subProvider.selectedSubscription,
-                                  isEnabled: true,
+                                  isEnabled: widget.isEdit ? false : true,
                                   onChanged: (value) {
                                     if (value != null) {
                                       subProvider.selectSubscription(value);
@@ -107,6 +119,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                       subProvider.selectPayment(value);
                                     }
                                   },
+                                  selectedItem: subProvider.selectedPaymentMode,
                                   title: "Payment Mode",
                                   items: subProvider.paymentModes,
                                   path1: "down",
@@ -239,6 +252,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                       subProvider.selectNotificaition(value);
                                     }
                                   },
+                                  selectedItem:
+                                      subProvider.selectedNotification,
                                   title: "Notification Alert",
                                   items: subProvider.notificationAlerts,
                                   path1: "down",
@@ -249,16 +264,17 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                           ),
                         ),
                       ),
-                   
+
                       const SizedBox(height: 15),
                       CustomElevatedButton(
                         screenW: screenW * 1.05,
                         colorScheme: colorScheme,
-                        text: "Add the Subscription",
+                        text:
+                            widget.isEdit ? "Save Changes" : "Add Subscription",
                         showLoader: subProvider.isLoading,
                         onPressed: () async {
                           if (subProvider.selectedSubscription == null ||
-                              subProvider.selectedPayment == null ||
+                              subProvider.selectedPaymentMode == null ||
                               subProvider.selectedDate == null ||
                               subProvider.selectedNotification == null ||
                               subProvider.selectedPlan == null) {
@@ -268,19 +284,34 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                             );
                             return;
                           }
-                          final success = await subProvider.addSubscription(
-                            context: context,
-                            currentUserId:
-                                FirebaseAuth.instance.currentUser!.uid,
-                            subscriptionName: subProvider.selectedSubscription!,
-                            paymentMode: subProvider.selectedPayment!,
-                            paymentDate: subProvider.selectedDate!,
-                            notificationAlert:
-                                subProvider.selectedNotification!,
-                            plan: subProvider.selectedPlan!,
-                          );
-                          if (success && context.mounted) {
-                            context.read<SubscriptionProvider>().reset();
+                          bool success = false;
+                          if (widget.isEdit && widget.editData != null) {
+                            success = await subProvider.updateSubscription(
+                              context: context,
+                              userId: FirebaseAuth.instance.currentUser!.uid,
+                              oldData: widget.editData!,
+                            );
+                            if (success && context.mounted) {
+                              context.read<SubscriptionProvider>().reset();
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }
+                          } else {
+                            success = await subProvider.addSubscription(
+                              context: context,
+                              currentUserId:
+                                  FirebaseAuth.instance.currentUser!.uid,
+                              subscriptionName:
+                                  subProvider.selectedSubscription!,
+                              paymentMode: subProvider.selectedPaymentMode!,
+                              paymentDate: subProvider.selectedDate!,
+                              notificationAlert:
+                                  subProvider.selectedNotification!,
+                              plan: subProvider.selectedPlan!,
+                            );
+                            if (success && context.mounted) {
+                              context.read<SubscriptionProvider>().reset();
+                            }
                           }
                         },
                       ),

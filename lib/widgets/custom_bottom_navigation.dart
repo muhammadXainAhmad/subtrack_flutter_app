@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:subtrack/providers/bottom_nav_provider.dart';
 import 'package:subtrack/utils/utils.dart';
 
-class CustomBottomNavigation extends StatefulWidget {
+class CustomBottomNavigation extends StatelessWidget {
   const CustomBottomNavigation({super.key});
-
-  @override
-  State<CustomBottomNavigation> createState() => _CustomBottomNavigationState();
-}
-
-class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
-  int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final bottomNav = context.watch<BottomNavProvider>();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       child: ClipRRect(
@@ -39,11 +36,9 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
               label: "person",
             ),
           ],
-          selectedIndex: currentIndex,
+          selectedIndex: bottomNav.currentIndex,
           onDestinationSelected: (index) {
-            setState(() {
-              currentIndex = index;
-            });
+            bottomNav.setIndex(index);
           },
         ),
       ),

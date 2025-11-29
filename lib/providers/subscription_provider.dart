@@ -9,10 +9,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class SubscriptionProvider with ChangeNotifier {
-  SubscriptionProvider() {
-    fetchActiveSubNumbers();
-  }
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -23,7 +19,7 @@ class SubscriptionProvider with ChangeNotifier {
   List<String> _notificationAlerts = [];
   String? _selectedSubscription;
   PlanModel? _selectedPlan;
-  String? _selectedPayment;
+  String? _selectedPaymentMode;
   String? _selectedBillingCycle;
   DateTime? _selectedDate;
   String? _selectedNotification;
@@ -36,7 +32,7 @@ class SubscriptionProvider with ChangeNotifier {
   List<String> get notificationAlerts => _notificationAlerts;
   String? get selectedSubscription => _selectedSubscription;
   PlanModel? get selectedPlan => _selectedPlan;
-  String? get selectedPayment => _selectedPayment;
+  String? get selectedPaymentMode => _selectedPaymentMode;
   String? get selectedBillingCycle => _selectedBillingCycle;
   DateTime? get selectedDate => _selectedDate;
   String? get selectedNotification => _selectedNotification;
@@ -76,14 +72,12 @@ class SubscriptionProvider with ChangeNotifier {
   void reset() {
     _selectedSubscription = null;
     _selectedPlan = null;
-    _selectedPayment = null;
+    _selectedPaymentMode = null;
     _selectedBillingCycle = null;
     _selectedDate = null;
     _selectedNotification = null;
-
     _plans = [];
     _billingCycle = [];
-
     notifyListeners();
   }
 
@@ -132,7 +126,7 @@ class SubscriptionProvider with ChangeNotifier {
   }
 
   void selectPayment(String selectedPaymentMode) {
-    _selectedPayment = selectedPaymentMode;
+    _selectedPaymentMode = selectedPaymentMode;
     notifyListeners();
   }
 
@@ -145,23 +139,26 @@ class SubscriptionProvider with ChangeNotifier {
     _selectedNotification = selectedNotificationAlert;
   }
 
+  // Fetch number of active subscriptions on home screen
   Future<void> fetchActiveSubNumbers() async {
     final uid = _auth.currentUser!.uid;
     try {
-      final snapshot =
-          await _firestore
-              .collection("users")
-              .doc(uid)
-              .collection("users_subscriptions")
-              .get();
-      _subCount = snapshot.docs.length;
-      notifyListeners();
+      _firestore
+          .collection("users")
+          .doc(uid)
+          .collection("users_subscriptions")
+          .snapshots()
+          .listen((snapshot) {
+            _subCount = snapshot.docs.length;
+            notifyListeners();
+          });
     } catch (e) {
       if (kDebugMode) print("Error counting subscriptions: $e");
     }
     notifyListeners();
   }
 
+  // Adding a new subscription
   bool success = false;
   bool isLoading = false;
 
@@ -223,6 +220,7 @@ class SubscriptionProvider with ChangeNotifier {
           success: true,
         );
       }
+      return success;
     } on FirebaseException catch (e) {
       if (context.mounted) {
         showSnack(text: e.message ?? "Something went wrong.", context: context);
@@ -238,6 +236,86 @@ class SubscriptionProvider with ChangeNotifier {
       notifyListeners();
     }
     return success;
+  }
+
+  // Loading data for existing subscription
+  void loadEditSubscriptionData(SubscriptionModel editData) async {
+    fetchPaymentModes();
+    fetchNotificationAlerts();
+    try {
+      final docId = editData.subscriptionName.toLowerCase().replaceAll(
+        " ",
+        "_",
+      );
+      final doc = await _firestore.collection("subscriptions").doc(docId).get();
+
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data["plans"] != null) {
+          final plansList = data["plans"] as List<dynamic>;
+          _plans = plansList.map((p) => PlanModel.fromMap(p)).toList();
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching plans for $editData.subscriptionName: $e");
+      }
+    }
+    _selectedSubscription = editData.subscriptionName;
+    _selectedPlan = editData.plan;
+    _selectedPaymentMode = editData.paymentMode;
+    _selectedBillingCycle = editData.plan.billingCycle;
+    _selectedDate = editData.paymentDate;
+    _selectedNotification = editData.notificationAlert;
+    _billingCycle = [editData.plan.billingCycle];
+    notifyListeners();
+  }
+
+  // Update existing subscription with new data
+  Future<bool> updateSubscription({
+    required BuildContext context,
+    required String userId,
+    required SubscriptionModel oldData,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+      final updated = SubscriptionModel(
+        subscriptionId: oldData.subscriptionId,
+        subscriptionName: oldData.subscriptionName,
+        paymentDate: oldData.paymentDate,
+        nextPaymentDate: oldData.nextPaymentDate,
+        iconUrl: oldData.iconUrl,
+        webUrl: oldData.webUrl,
+        createdAt: oldData.createdAt,
+        plan: _selectedPlan!,
+        paymentMode: _selectedPaymentMode!,
+        notificationAlert: _selectedNotification!,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection("users")
+          .doc(userId)
+          .collection("users_subscriptions")
+          .doc(oldData.subscriptionId)
+          .update(updated.toMap());
+
+      if (context.mounted) {
+        showSnack(
+          text: "Subscription successfully edited!",
+          context: context,
+          success: true,
+        );
+      }
+      success = true;
+      return success;
+    } catch (e) {
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> openLink(String url) async {

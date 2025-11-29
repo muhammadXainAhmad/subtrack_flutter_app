@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:subtrack/models/subscription_model.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
+import 'package:subtrack/screens/add_subscription_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
 import 'package:subtrack/widgets/custom_app_bar.dart';
@@ -9,7 +11,7 @@ import 'package:subtrack/widgets/text.dart';
 import 'package:intl/intl.dart';
 
 class SubscriptionDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> subscriptionData;
+  final SubscriptionModel subscriptionData;
   const SubscriptionDetailsScreen({super.key, required this.subscriptionData});
 
   @override
@@ -18,9 +20,8 @@ class SubscriptionDetailsScreen extends StatelessWidget {
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
     final renewalDays =
-        subscriptionData["nextPaymentDate"]
-            .toDate()
-            .difference(subscriptionData["paymentDate"].toDate())
+        subscriptionData.nextPaymentDate
+            .difference(subscriptionData.paymentDate)
             .inDays;
     return Scaffold(
       appBar: CustomAppBar(text: "Subscription Details"),
@@ -40,7 +41,7 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                       backgroundColor: whiteClr,
                       child: ClipOval(
                         child: Image.network(
-                          subscriptionData["iconUrl"],
+                          subscriptionData.iconUrl,
                           width: 64,
                           height: 64,
                           fit: BoxFit.contain,
@@ -53,13 +54,13 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           GestureDetector(
-                            onTap: () async{
+                            onTap: () async {
                               final provider =
                                   context.read<SubscriptionProvider>();
-                              await provider.openLink(subscriptionData["webUrl"]);
+                              await provider.openLink(subscriptionData.webUrl);
                             },
                             child: BuildText(
-                              text: subscriptionData["subscriptionName"],
+                              text: subscriptionData.subscriptionName,
                               textSize: 18,
                               textWeight: FontWeight.w900,
                             ),
@@ -67,7 +68,7 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                           BuildText(
                             text:
                                 renewalDays > 7
-                                    ? "Renewal on ${DateFormat("dd MMM yyyy").format(subscriptionData["nextPaymentDate"].toDate())}"
+                                    ? "Renewal on ${DateFormat("dd MMM yyyy").format(subscriptionData.nextPaymentDate)}"
                                     : "Expires in $renewalDays days",
                             textSize: 12,
                             textClr:
@@ -90,7 +91,18 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                       textWeight: FontWeight.w600,
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => AddSubscriptionScreen(
+                                  isEdit: true,
+                                  editData: subscriptionData,
+                                ),
+                          ),
+                        );
+                      },
                       child: BuildText(
                         text: "Edit",
                         textSize: 16,
@@ -116,39 +128,37 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                       children: [
                         detailsRow(
                           title: "Subscription Plan",
-                          detail: "${subscriptionData["plan"]["name"]}",
+                          detail: subscriptionData.plan.name,
                         ),
                         detailsRow(
                           title: "Subscription Price",
                           detail:
-                              " ${subscriptionData["plan"]["currency"]}${subscriptionData["plan"]["price"]}",
+                              " ${subscriptionData.plan.currency}${subscriptionData.plan.price}",
                         ),
                         detailsRow(
                           title: "Renewal Date",
-                          detail: DateFormat("dd MMM yyyy").format(
-                            subscriptionData["nextPaymentDate"].toDate(),
-                          ),
+                          detail: DateFormat(
+                            "dd MMM yyyy",
+                          ).format(subscriptionData.nextPaymentDate),
                         ),
                         detailsRow(
                           title: "Last Payment Date",
                           detail:
                               DateFormat("dd MMM yyyy")
-                                  .format(
-                                    subscriptionData["paymentDate"].toDate(),
-                                  )
+                                  .format(subscriptionData.paymentDate)
                                   .toString(),
                         ),
                         detailsRow(
                           title: "Payment Mode",
-                          detail: subscriptionData["paymentMode"],
+                          detail: subscriptionData.paymentMode,
                         ),
                         detailsRow(
                           title: "Billing Cycle",
-                          detail: subscriptionData["plan"]["billingCycle"],
+                          detail: subscriptionData.plan.billingCycle,
                         ),
                         detailsRow(
                           title: "Notification Alert",
-                          detail: subscriptionData["notificationAlert"],
+                          detail: subscriptionData.notificationAlert,
                         ),
                       ],
                     ),
