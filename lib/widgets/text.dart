@@ -7,6 +7,7 @@ class BuildText extends StatelessWidget {
   final FontWeight? textWeight;
   final TextAlign? textAlign;
   final String? textFont;
+  final TextDecoration? textDecoration;
   const BuildText({
     super.key,
     required this.text,
@@ -15,6 +16,7 @@ class BuildText extends StatelessWidget {
     this.textWeight,
     this.textAlign,
     this.textFont,
+    this.textDecoration,
   });
 
   @override
@@ -28,6 +30,10 @@ class BuildText extends StatelessWidget {
         fontSize: textSize,
         fontWeight: textWeight ?? FontWeight.normal,
         fontFamily: textFont,
+        decoration: textDecoration,
+        decorationColor: colorScheme.onSurface,
+        decorationThickness: 1.5,
+        decorationStyle: TextDecorationStyle.solid,
       ),
     );
   }

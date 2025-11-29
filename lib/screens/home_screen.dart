@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:subtrack/methods/helper_methods.dart';
 import 'package:subtrack/models/subscription_model.dart';
 import 'package:subtrack/providers/segmented_btn_provider.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
@@ -67,11 +68,13 @@ class HomeScreen extends StatelessWidget {
                     onPressed: () {},
                     path: "history",
                     colorScheme: colorScheme,
+                    tooltipText: "Transaction History",
                   ),
                   _buildActionIcon(
                     onPressed: () {},
                     path: "notification",
                     colorScheme: colorScheme,
+                    tooltipText: "Notifications",
                   ),
                   _buildActionIcon(
                     onPressed:
@@ -83,6 +86,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                     path: "settings",
                     colorScheme: colorScheme,
+                    tooltipText: "Settings",
                   ),
                 ],
               ),
@@ -110,28 +114,83 @@ class HomeScreen extends StatelessWidget {
                               ),
                               child: Column(
                                 children: [
-                                  const Row(
+                                  Row(
                                     children: [
                                       BuildText(
-                                        text: "Monthly Bills",
+                                        text: "${subProvider.view} Bill",
                                         textSize: 16,
                                       ),
-                                      Spacer(),
-                                      BuildText(text: "Daily", textSize: 12),
-                                      SizedBox(width: 20),
-                                      BuildText(text: "Weekly", textSize: 12),
-                                      SizedBox(width: 20),
-                                      BuildText(text: "Monthly", textSize: 12),
+                                      const Spacer(),
+                                      GestureDetector(
+                                        onTap:
+                                            () => subProvider.setBillView(
+                                              "Weekly",
+                                            ),
+                                        child: BuildText(
+                                          text: "Weekly",
+                                          textSize: 12,
+                                          textDecoration:
+                                              subProvider.view == "Weekly"
+                                                  ? TextDecoration.underline
+                                                  : null,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 20),
+                                      GestureDetector(
+                                        onTap:
+                                            () => subProvider.setBillView(
+                                              "Monthly",
+                                            ),
+                                        child: BuildText(
+                                          text: "Monthly",
+                                          textSize: 12,
+                                          textDecoration:
+                                              subProvider.view == "Monthly"
+                                                  ? TextDecoration.underline
+                                                  : null,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 20),
+                                      GestureDetector(
+                                        onTap:
+                                            () => subProvider.setBillView(
+                                              "Annual",
+                                            ),
+                                        child: BuildText(
+                                          text: "Annual",
+                                          textSize: 12,
+                                          textDecoration:
+                                              subProvider.view == "Annual"
+                                                  ? TextDecoration.underline
+                                                  : null,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    alignment: WrapAlignment.center,
+                                    spacing: 12,
+                                    runSpacing: 20,
                                     children: [
-                                      const BuildText(
-                                        text: "\$1,532",
-                                        textSize: 32,
+                                      BuildText(
+                                        text:
+                                            subProvider.view == "Weekly"
+                                                ? formatPKR(
+                                                  subProvider.weeklyTotal!,
+                                                )
+                                                : subProvider.view == "Monthly"
+                                                ? formatPKR(
+                                                  subProvider.monthlyTotal!,
+                                                )
+                                                : subProvider.view == "Annual"
+                                                ? formatPKR(
+                                                  subProvider.yearlyTotal!,
+                                                )
+                                                : '0',
+                                        textSize: 26,
                                         textWeight: FontWeight.w700,
                                       ),
                                       ElevatedButton(
@@ -250,6 +309,7 @@ class HomeScreen extends StatelessWidget {
                           .collection("users")
                           .doc(FirebaseAuth.instance.currentUser!.uid)
                           .collection("users_subscriptions")
+                          .orderBy("createdAt", descending: false)
                           .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -343,7 +403,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               trailing: BuildText(
                                 text:
-                                    "${subscriptionData.plan.currency}${subscriptionData.plan.price} / ${subscriptionData.plan.billingCycle.toString().substring(0, 2).toUpperCase()}",
+                                    "${subscriptionData.plan.currency} ${subscriptionData.plan.price} / ${subscriptionData.plan.billingCycle.toString().substring(0, 2).toUpperCase()}",
                                 textSize: 12,
                               ),
                             ),
@@ -359,14 +419,24 @@ class HomeScreen extends StatelessWidget {
         );
   }
 
-  IconButton _buildActionIcon({
+  Tooltip _buildActionIcon({
     required VoidCallback onPressed,
     required String path,
     required ColorScheme colorScheme,
+    required String tooltipText,
   }) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: customSvg(path: path, colorScheme: colorScheme),
+    return Tooltip(
+      message: tooltipText,
+      textStyle: TextStyle(color: colorScheme.onSurface),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colorScheme.surfaceContainerLowest),
+      ),
+      child: IconButton(
+        onPressed: onPressed,
+        icon: customSvg(path: path, colorScheme: colorScheme),
+      ),
     );
   }
 }

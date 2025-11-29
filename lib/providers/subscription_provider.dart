@@ -24,6 +24,10 @@ class SubscriptionProvider with ChangeNotifier {
   DateTime? _selectedDate;
   String? _selectedNotification;
   int? _subCount;
+  double? _weeklyTotal;
+  double? _monthlyTotal;
+  double? _yearlyTotal;
+  String _view = "Monthly";
 
   List<String> get subscriptionNames => _subscriptionNames;
   List<PlanModel> get plans => _plans;
@@ -37,6 +41,10 @@ class SubscriptionProvider with ChangeNotifier {
   DateTime? get selectedDate => _selectedDate;
   String? get selectedNotification => _selectedNotification;
   int? get subCount => _subCount;
+  double? get weeklyTotal => _weeklyTotal;
+  double? get monthlyTotal => _monthlyTotal;
+  double? get yearlyTotal => _yearlyTotal;
+  String get view => _view;
 
   Future<void> fetchSubscriptionNames() async {
     try {
@@ -139,6 +147,41 @@ class SubscriptionProvider with ChangeNotifier {
     _selectedNotification = selectedNotificationAlert;
   }
 
+  Future<void> calculateBills() async {
+    _weeklyTotal = 0;
+    _monthlyTotal = 0;
+    _yearlyTotal = 0;
+    final uid = _auth.currentUser!.uid;
+    final subs =
+        await _firestore
+            .collection("users")
+            .doc(uid)
+            .collection("users_subscriptions")
+            .get();
+    for (var doc in subs.docs) {
+      final data = doc.data();
+      final cycle = data["plan"]["billingCycle"];
+      final price = (data["plan"]["price"] as num).toDouble();
+
+      if (cycle == "Monthly") {
+        _weeklyTotal = (_weeklyTotal! + (price / 4.345)).roundToDouble();
+        _monthlyTotal = (_monthlyTotal! + price).roundToDouble();
+        _yearlyTotal = (_yearlyTotal! + (price * 12)).roundToDouble();
+      }
+      if (cycle == "Yearly") {
+        _weeklyTotal = (_weeklyTotal! + (price / 52)).roundToDouble();
+        _monthlyTotal = (_monthlyTotal! + (price / 12)).roundToDouble();
+        _yearlyTotal = (_yearlyTotal! + price).roundToDouble();
+      }
+      notifyListeners();
+    }
+  }
+
+  void setBillView(String view) {
+    _view = view;
+    notifyListeners();
+  }
+
   // Fetch number of active subscriptions on home screen
   Future<void> fetchActiveSubNumbers() async {
     final uid = _auth.currentUser!.uid;
@@ -212,7 +255,6 @@ class SubscriptionProvider with ChangeNotifier {
           .collection("users_subscriptions")
           .doc(subscriptionId)
           .set(subscription.toMap());
-      success = true;
       if (context.mounted) {
         showSnack(
           text: "Subscription successfully added!",
@@ -220,6 +262,8 @@ class SubscriptionProvider with ChangeNotifier {
           success: true,
         );
       }
+      calculateBills();
+      success = true;
       return success;
     } on FirebaseException catch (e) {
       if (context.mounted) {
@@ -308,6 +352,7 @@ class SubscriptionProvider with ChangeNotifier {
           success: true,
         );
       }
+      calculateBills();
       success = true;
       return success;
     } catch (e) {

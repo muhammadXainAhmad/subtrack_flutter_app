@@ -24,7 +24,13 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthenticationProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
-        ChangeNotifierProvider(create: (context) => SubscriptionProvider()..fetchActiveSubNumbers()),
+        ChangeNotifierProvider(
+          create:
+              (context) =>
+                  SubscriptionProvider()
+                    ..fetchActiveSubNumbers()
+                    ..calculateBills(),
+        ),
         ChangeNotifierProvider(create: (context) => BottomNavProvider()),
         ChangeNotifierProvider(create: (context) => SegmentedBtnProvider()),
       ],
