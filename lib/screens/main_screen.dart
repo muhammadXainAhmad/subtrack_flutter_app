@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/providers/bottom_nav_provider.dart';
 import 'package:subtrack/screens/add_subscription_screen.dart';
+import 'package:subtrack/screens/explore_screen.dart';
 import 'package:subtrack/screens/home_screen.dart';
 import 'package:subtrack/screens/profile_screen.dart';
 import 'package:subtrack/utils/utils.dart';
@@ -16,7 +17,7 @@ class MainScreen extends StatelessWidget {
     final bottomNav = context.watch<BottomNavProvider>();
     final List<Widget> pages = [
       HomeScreen(),
-      HomeScreen(),
+      ExploreScreen(),
       HomeScreen(),
       ProfileScreen(),
     ];

@@ -89,6 +89,7 @@ flutter:
     - assets/icons/calendarSearch.svg
     - assets/icons/calendarSync.svg
     - assets/icons/phone.svg
+    - assets/icons/star.svg
 
   fonts:
     - family: DancingScript

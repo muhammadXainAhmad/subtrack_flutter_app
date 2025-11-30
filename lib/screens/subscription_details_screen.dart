@@ -133,7 +133,7 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                         detailsRow(
                           title: "Subscription Price",
                           detail:
-                              " ${subscriptionData.plan.currency}${subscriptionData.plan.price}",
+                              " ${subscriptionData.plan.currency} ${subscriptionData.plan.price}",
                         ),
                         detailsRow(
                           title: "Renewal Date",

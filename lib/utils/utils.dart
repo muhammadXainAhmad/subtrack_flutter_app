@@ -14,11 +14,15 @@ const transparentClr = Colors.transparent;
 SvgPicture customSvg({
   required String path,
   required ColorScheme colorScheme,
+  Color? clr,
   double? width,
 }) {
   return SvgPicture.asset(
     "assets/icons/$path.svg",
-    colorFilter: ColorFilter.mode(colorScheme.onSurface, BlendMode.srcIn),
+    colorFilter: ColorFilter.mode(
+      clr ?? colorScheme.onSurface,
+      BlendMode.srcIn,
+    ),
     width: width,
   );
 }
