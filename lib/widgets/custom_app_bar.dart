@@ -9,7 +9,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.bgClr,
     this.textClr,
     this.textSize,
-    this.isCenter=false
+    this.isCenter = false,
+    this.onTap,
   });
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -18,6 +19,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double? textSize;
   final Color? textClr;
   final bool? isCenter;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +31,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: customSvg(path: "left", colorScheme: colorScheme, width: 32),
       ),
       centerTitle: isCenter,
-      title: BuildText(
-        text: text,
-        textSize: textSize ?? 20,
-        textClr: textClr,
-        textWeight: FontWeight.w700,
+      title: GestureDetector(
+        onTap: onTap,
+        child: BuildText(
+          text: text,
+          textSize: textSize ?? 20,
+          textClr: textClr,
+          textWeight: FontWeight.w700,
+        ),
       ),
     );
   }

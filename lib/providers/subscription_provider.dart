@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:subtrack/models/plan_model.dart';
 import 'package:subtrack/models/subscription_model.dart';
+import 'package:subtrack/providers/chart_provider.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
@@ -233,12 +235,14 @@ class SubscriptionProvider with ChangeNotifier {
               .collection("subscriptions")
               .doc(subscriptionName.toLowerCase().replaceAll(" ", "_"))
               .get();
+      final category = snap["category"];
       final iconUrl = snap["iconUrl"];
       final webUrl = snap["website"];
 
       final subscription = SubscriptionModel(
         subscriptionId: subscriptionId,
         subscriptionName: subscriptionName,
+        category: category,
         paymentMode: paymentMode,
         paymentDate: paymentDate,
         nextPaymentDate: nextPaymentDate!,
@@ -261,8 +265,10 @@ class SubscriptionProvider with ChangeNotifier {
           context: context,
           success: true,
         );
+        context.read<ChartProvider>().fetchCategoryData();
       }
       calculateBills();
+
       success = true;
       return success;
     } on FirebaseException catch (e) {
@@ -327,6 +333,7 @@ class SubscriptionProvider with ChangeNotifier {
       final updated = SubscriptionModel(
         subscriptionId: oldData.subscriptionId,
         subscriptionName: oldData.subscriptionName,
+        category: oldData.category,
         paymentDate: oldData.paymentDate,
         nextPaymentDate: oldData.nextPaymentDate,
         iconUrl: oldData.iconUrl,

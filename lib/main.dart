@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:subtrack/firebase_options.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/providers/bottom_nav_provider.dart';
+import 'package:subtrack/providers/chart_provider.dart';
 import 'package:subtrack/providers/segmented_btn_provider.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/providers/user_provider.dart';
@@ -33,6 +34,7 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (context) => BottomNavProvider()),
         ChangeNotifierProvider(create: (context) => SegmentedBtnProvider()),
+        ChangeNotifierProvider(create: (context) => ChartProvider()..fetchCategoryData()),
       ],
       child: const MyApp(),
     ),

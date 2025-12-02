@@ -4,6 +4,7 @@ import 'package:subtrack/models/plan_model.dart';
 class SubscriptionModel {
   final String subscriptionId;
   final String subscriptionName;
+  final String category;
   final String paymentMode;
   final DateTime paymentDate;
   final DateTime nextPaymentDate;
@@ -17,6 +18,7 @@ class SubscriptionModel {
   SubscriptionModel({
     required this.subscriptionId,
     required this.subscriptionName,
+    required this.category,
     required this.paymentMode,
     required this.paymentDate,
     required this.nextPaymentDate,
@@ -32,6 +34,7 @@ class SubscriptionModel {
     return SubscriptionModel(
       subscriptionId: map["subscriptionId"] as String,
       subscriptionName: map['subscriptionName'] as String,
+      category: map["category"] as String,
       paymentMode: map['paymentMode'] as String,
       paymentDate: (map['paymentDate'] as Timestamp).toDate(),
       nextPaymentDate: (map['nextPaymentDate'] as Timestamp).toDate(),
@@ -48,6 +51,7 @@ class SubscriptionModel {
     return {
       "subscriptionId": subscriptionId,
       "subscriptionName": subscriptionName,
+      "category": category,
       'paymentMode': paymentMode,
       'paymentDate': paymentDate,
       'nextPaymentDate': nextPaymentDate,

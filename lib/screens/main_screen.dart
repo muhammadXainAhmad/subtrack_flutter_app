@@ -5,6 +5,7 @@ import 'package:subtrack/screens/add_subscription_screen.dart';
 import 'package:subtrack/screens/explore_screen.dart';
 import 'package:subtrack/screens/home_screen.dart';
 import 'package:subtrack/screens/profile_screen.dart';
+import 'package:subtrack/screens/analytics_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/custom_bottom_navigation.dart';
 
@@ -18,7 +19,7 @@ class MainScreen extends StatelessWidget {
     final List<Widget> pages = [
       HomeScreen(),
       ExploreScreen(),
-      HomeScreen(),
+      StatsScreen(),
       ProfileScreen(),
     ];
     return Scaffold(
