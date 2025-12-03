@@ -3,8 +3,8 @@ import 'package:subtrack/widgets/bg_container.dart';
 import 'package:subtrack/widgets/category_pie_chart.dart';
 import 'package:subtrack/widgets/text.dart';
 
-class StatsScreen extends StatelessWidget {
-  const StatsScreen({super.key});
+class AnalyticsScreen extends StatelessWidget {
+  const AnalyticsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +26,11 @@ class StatsScreen extends StatelessWidget {
       body: Stack(
         children: [
           BgContainer(screenW: screenW, screenH: screenH),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 18.0),
             child: Center(
               child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  BuildText(
-                    text: "Category-Wise Monthly Spendings",
-                    textSize: 18,
-                    textWeight: FontWeight.w600,
-                  ),
-                  const SizedBox(height: 20),
-                  CategoryPieChart(),
-
-                  const SizedBox(height: 20),
-                ],
+                children: [CategoryPieChart(), SizedBox(height: 20)],
               ),
             ),
           ),

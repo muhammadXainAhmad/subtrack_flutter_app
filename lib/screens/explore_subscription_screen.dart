@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:subtrack/providers/subscription_provider.dart';
+import 'package:subtrack/methods/helper_methods.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
 import 'package:subtrack/widgets/custom_app_bar.dart';
@@ -24,8 +23,7 @@ class ExploreSubscriptionScreen extends StatelessWidget {
         textClr: whiteClr,
         textSize: 22,
         onTap: () async {
-          final provider = context.read<SubscriptionProvider>();
-          await provider.openLink(sub["website"]);
+          openLink(sub["website"]);
         },
       ),
       body: Stack(

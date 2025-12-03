@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:subtrack/methods/helper_methods.dart';
 import 'package:subtrack/models/subscription_model.dart';
-import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/screens/add_subscription_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
@@ -54,11 +53,7 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           GestureDetector(
-                            onTap: () async {
-                              final provider =
-                                  context.read<SubscriptionProvider>();
-                              await provider.openLink(subscriptionData.webUrl);
-                            },
+                            onTap: () => openLink(subscriptionData.webUrl),
                             child: BuildText(
                               text: subscriptionData.subscriptionName,
                               textSize: 18,
@@ -144,9 +139,9 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                         detailsRow(
                           title: "Last Payment Date",
                           detail:
-                              DateFormat("dd MMM yyyy")
-                                  .format(subscriptionData.paymentDate)
-                                  .toString(),
+                              DateFormat(
+                                "dd MMM yyyy",
+                              ).format(subscriptionData.paymentDate).toString(),
                         ),
                         detailsRow(
                           title: "Payment Mode",

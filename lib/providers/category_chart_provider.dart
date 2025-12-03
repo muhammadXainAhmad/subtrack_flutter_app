@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ChartProvider extends ChangeNotifier {
+class CategoryChartProvider extends ChangeNotifier {
   final List<Color> pieChartSectionColors = [
     Color(0xFF113CCF),
     Color(0xFF1DB954),

@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/models/plan_model.dart';
 import 'package:subtrack/models/subscription_model.dart';
-import 'package:subtrack/providers/chart_provider.dart';
+import 'package:subtrack/providers/category_chart_provider.dart';
 import 'package:subtrack/utils/utils.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class SubscriptionProvider with ChangeNotifier {
@@ -84,7 +83,6 @@ class SubscriptionProvider with ChangeNotifier {
     _selectedPlan = null;
     _selectedPaymentMode = null;
     _selectedBillingCycle = null;
-    _selectedDate = null;
     _selectedNotification = null;
     _plans = [];
     _billingCycle = [];
@@ -140,12 +138,7 @@ class SubscriptionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> selectDate(DateTime pickedDate) async {
-    _selectedDate = pickedDate;
-    notifyListeners();
-  }
-
-  void selectNotificaition(String selectedNotificationAlert) {
+  void selectNotification(String selectedNotificationAlert) {
     _selectedNotification = selectedNotificationAlert;
   }
 
@@ -212,7 +205,7 @@ class SubscriptionProvider with ChangeNotifier {
     required String currentUserId,
     required String subscriptionName,
     required String paymentMode,
-    required DateTime paymentDate,
+
     required String notificationAlert,
     required PlanModel plan,
   }) async {
@@ -220,6 +213,7 @@ class SubscriptionProvider with ChangeNotifier {
     notifyListeners();
     try {
       final String subscriptionId = Uuid().v1();
+      final DateTime paymentDate = DateTime.now();
 
       // Calculate next payment date
       DateTime? nextPaymentDate;
@@ -244,7 +238,7 @@ class SubscriptionProvider with ChangeNotifier {
         subscriptionName: subscriptionName,
         category: category,
         paymentMode: paymentMode,
-        paymentDate: paymentDate,
+        paymentDate: DateTime.now(),
         nextPaymentDate: nextPaymentDate!,
         notificationAlert: notificationAlert,
         plan: plan,
@@ -265,7 +259,7 @@ class SubscriptionProvider with ChangeNotifier {
           context: context,
           success: true,
         );
-        context.read<ChartProvider>().fetchCategoryData();
+        context.read<CategoryChartProvider>().fetchCategoryData();
       }
       calculateBills();
 
@@ -367,13 +361,6 @@ class SubscriptionProvider with ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners();
-    }
-  }
-
-  Future<void> openLink(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 }

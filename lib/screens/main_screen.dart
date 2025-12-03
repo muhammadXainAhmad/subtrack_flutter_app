@@ -19,7 +19,7 @@ class MainScreen extends StatelessWidget {
     final List<Widget> pages = [
       HomeScreen(),
       ExploreScreen(),
-      StatsScreen(),
+      AnalyticsScreen(),
       ProfileScreen(),
     ];
     return Scaffold(

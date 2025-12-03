@@ -400,6 +400,7 @@ class HomeScreen extends StatelessWidget {
                                         ? "Renewal on ${DateFormat("dd MMM yyyy").format(subscriptionData.nextPaymentDate)}"
                                         : "Expires in $renewalDays days",
                                 textSize: 12,
+                                textClr: renewalDays <= 7 ? Colors.red : null,
                               ),
                               trailing: BuildText(
                                 text:

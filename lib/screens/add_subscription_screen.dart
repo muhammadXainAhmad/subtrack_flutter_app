@@ -50,10 +50,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         child: Scaffold(
           backgroundColor: colorScheme.surface,
           appBar: CustomAppBar(
-            text:
-                widget.isEdit
-                    ? "Edit Existing Subscription"
-                    : "Add New Subscription",
+            text: widget.isEdit ? "Edit Subscription" : "Add New Subscription",
           ),
           body: SafeArea(
             child: SingleChildScrollView(
@@ -126,76 +123,42 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                   path2: "up",
                                 ),
                                 BuildText(
-                                  text: "Payment Date",
+                                  text:
+                                      widget.isEdit
+                                          ? "Last Payment Date"
+                                          : "Purchase Date",
                                   textSize: 16,
                                   textAlign: TextAlign.left,
                                 ),
                                 const SizedBox(height: 10),
-                                IgnorePointer(
-                                  ignoring:
-                                      subProvider.selectedSubscription == null,
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      final DateTime? pickedDate =
-                                          await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(2020),
-                                            lastDate: DateTime(2050),
-                                          );
-                                      if (pickedDate != null) {
-                                        subProvider.selectDate(pickedDate);
-                                      }
-                                    },
-                                    child: Opacity(
-                                      opacity:
-                                          subProvider.selectedSubscription !=
-                                                  null
-                                              ? 1
-                                              : 0.5,
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 14,
-                                        ),
-                                        width: screenW,
-                                        height: 56,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              colorScheme.surfaceContainerLow,
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                          border: Border.all(
-                                            color:
-                                                colorScheme
-                                                    .surfaceContainerLowest,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            BuildText(
-                                              text:
-                                                  subProvider.selectedDate !=
-                                                          null
-                                                      ? DateFormat(
-                                                        "dd MMM yyyy",
-                                                      ).format(
-                                                        subProvider
-                                                            .selectedDate!,
-                                                      )
-                                                      : "",
-                                              textSize: 15,
-                                            ),
-                                            customSvg(
-                                              path: "calendarSearch",
-                                              colorScheme: colorScheme,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 14),
+                                  width: screenW,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceContainerLow,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: colorScheme.surfaceContainerLowest,
                                     ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      BuildText(
+                                        text: DateFormat("dd MMM yyyy").format(
+                                          widget.isEdit
+                                              ? subProvider.selectedDate!
+                                              : DateTime.now(),
+                                        ),
+                                        textSize: 15,
+                                      ),
+                                      customSvg(
+                                        path: "calendarSearch",
+                                        colorScheme: colorScheme,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const SizedBox(height: 15),
@@ -249,7 +212,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                                       subProvider.selectedSubscription != null,
                                   onChanged: (value) {
                                     if (value != null) {
-                                      subProvider.selectNotificaition(value);
+                                      subProvider.selectNotification(value);
                                     }
                                   },
                                   selectedItem:
@@ -275,7 +238,6 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                         onPressed: () async {
                           if (subProvider.selectedSubscription == null ||
                               subProvider.selectedPaymentMode == null ||
-                              subProvider.selectedDate == null ||
                               subProvider.selectedNotification == null ||
                               subProvider.selectedPlan == null) {
                             showSnack(
@@ -304,7 +266,6 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                               subscriptionName:
                                   subProvider.selectedSubscription!,
                               paymentMode: subProvider.selectedPaymentMode!,
-                              paymentDate: subProvider.selectedDate!,
                               notificationAlert:
                                   subProvider.selectedNotification!,
                               plan: subProvider.selectedPlan!,

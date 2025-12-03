@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/methods/helper_methods.dart';
-import 'package:subtrack/providers/chart_provider.dart';
+import 'package:subtrack/providers/category_chart_provider.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/text.dart';
@@ -13,7 +13,7 @@ class CategoryPieChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final provider = context.watch<ChartProvider>();
+    final provider = context.watch<CategoryChartProvider>();
     final subProvider = context.watch<SubscriptionProvider>();
     return provider.isLoading
         ? Center(
@@ -68,10 +68,21 @@ class CategoryPieChart extends StatelessWidget {
                                 .toList(),
                       ),
                     ),
-                    BuildText(
-                      text: formatPKR(subProvider.monthlyTotal!),
-                      textSize: 22,
-                      textWeight: FontWeight.w700,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        BuildText(
+                          text: formatPKR(subProvider.monthlyTotal!),
+                          textSize: 22,
+                          textWeight: FontWeight.w700,
+                        ),
+                        BuildText(
+                          text: "Monthly",
+                          textSize: 16,
+                          textWeight: FontWeight.w500,
+                        ),
+                      ],
                     ),
                   ],
                 ),
