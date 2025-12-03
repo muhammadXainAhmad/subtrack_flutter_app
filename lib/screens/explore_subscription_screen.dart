@@ -14,7 +14,7 @@ class ExploreSubscriptionScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final screenW = MediaQuery.of(context).size.width;
     final screenH = MediaQuery.of(context).size.height;
-    final Color subClr = Color(int.parse(sub["color"].replaceAll("#", "0xFF")));
+    final Color subClr = hexToColor(sub["color"]);
     return Scaffold(
       appBar: CustomAppBar(
         text: sub["name"],

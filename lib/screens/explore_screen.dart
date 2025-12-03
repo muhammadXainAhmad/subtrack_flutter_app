@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:subtrack/methods/helper_methods.dart';
 import 'package:subtrack/providers/explore_provider.dart';
 import 'package:subtrack/widgets/text.dart';
 import 'package:subtrack/widgets/bg_container.dart';
@@ -124,13 +125,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                       itemBuilder: (context, index) {
                                         final sub =
                                             provider.filteredSubs[index];
-                                        Color tileClr = Color(
-                                          int.parse(
-                                            sub["color"].replaceAll(
-                                              "#",
-                                              "0xFF",
-                                            ),
-                                          ),
+                                        Color tileClr = hexToColor(
+                                          sub["color"],
                                         );
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(

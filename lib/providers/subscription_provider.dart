@@ -363,4 +363,41 @@ class SubscriptionProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> deleteSubscription(BuildContext context, String subId) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+      await _firestore
+          .collection("users")
+          .doc(_auth.currentUser!.uid)
+          .collection("users_subscriptions")
+          .doc(subId)
+          .delete();
+      success = true;
+      calculateBills();
+      if (context.mounted) {
+        context.read<CategoryChartProvider>().fetchCategoryData();
+        showSnack(
+          text: "Subscription successfully deleted!",
+          context: context,
+          success: true,
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.message ?? "Something went wrong.", context: context);
+        success = false;
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.toString(), context: context);
+        success = false;
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+    return success;
+  }
 }
