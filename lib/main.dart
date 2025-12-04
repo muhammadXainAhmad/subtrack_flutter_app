@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +9,7 @@ import 'package:subtrack/firebase_options.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/providers/bottom_nav_provider.dart';
 import 'package:subtrack/providers/category_chart_provider.dart';
+import 'package:subtrack/providers/notification_provider.dart';
 import 'package:subtrack/providers/segmented_btn_provider.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/providers/user_provider.dart';
@@ -14,10 +17,21 @@ import 'package:subtrack/screens/landing_screen.dart';
 import 'package:subtrack/screens/main_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 
+@pragma("vm:entry-point")
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  if (kDebugMode) {
+    print("TITLE: ${message.notification!.title.toString()}");
+    print("BODY: ${message.notification!.body.toString()}");
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   // uploadSubscriptionData();
   // updateSubscriptionIcons();
   runApp(
@@ -37,6 +51,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) => CategoryChartProvider()..fetchCategoryData(),
         ),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
       ],
       child: const MyApp(),
     ),
