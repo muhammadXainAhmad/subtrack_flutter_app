@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:subtrack/methods/notification_methods.dart';
 import 'package:subtrack/models/plan_model.dart';
 import 'package:subtrack/models/subscription_model.dart';
 import 'package:subtrack/providers/category_chart_provider.dart';
@@ -200,6 +201,8 @@ class SubscriptionProvider with ChangeNotifier {
   bool success = false;
   bool isLoading = false;
 
+  NotificationMethods notificationMethods = NotificationMethods();
+
   Future<bool> addSubscription({
     required BuildContext context,
     required String currentUserId,
@@ -261,6 +264,12 @@ class SubscriptionProvider with ChangeNotifier {
         );
         context.read<CategoryChartProvider>().fetchCategoryData();
       }
+      final token = await notificationMethods.getDeviceToken();
+      notificationMethods.sendPushNotification(
+        deviceToken: token,
+        title: "SubTrack",
+        body: "Congrats! $subscriptionName Subscription Purchased!",
+      );
       calculateBills();
 
       success = true;
@@ -353,6 +362,13 @@ class SubscriptionProvider with ChangeNotifier {
           success: true,
         );
       }
+      final token = await notificationMethods.getDeviceToken();
+      notificationMethods.sendPushNotification(
+        deviceToken: token,
+        title: "SubTrack",
+        body:
+            "${oldData.subscriptionName} Subscription Updated!",
+      );
       calculateBills();
       success = true;
       return success;
@@ -364,7 +380,11 @@ class SubscriptionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> deleteSubscription(BuildContext context, String subId) async {
+  Future<bool> deleteSubscription({
+    required BuildContext context,
+    required subId,
+    required String subName,
+  }) async {
     try {
       isLoading = true;
       notifyListeners();
@@ -384,6 +404,12 @@ class SubscriptionProvider with ChangeNotifier {
           success: true,
         );
       }
+      final token = await notificationMethods.getDeviceToken();
+      notificationMethods.sendPushNotification(
+        deviceToken: token,
+        title: "SubTrack",
+        body: "$subName Subscription Deleted!",
+      );
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
         showSnack(text: e.message ?? "Something went wrong.", context: context);

@@ -227,7 +227,6 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 15),
                       CustomElevatedButton(
                         screenW: screenW * 1.05,

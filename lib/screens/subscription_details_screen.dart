@@ -227,8 +227,11 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                                       text: "Yes",
                                       onPressed: () async {
                                         await subProvider.deleteSubscription(
-                                          context,
-                                          subscriptionData.subscriptionId,
+                                          context: context,
+                                          subId:
+                                              subscriptionData.subscriptionId,
+                                          subName:
+                                              subscriptionData.subscriptionName,
                                         );
                                         if (context.mounted) {
                                           Navigator.pop(context);
