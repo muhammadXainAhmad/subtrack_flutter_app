@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:subtrack/methods/notification_methods.dart';
+import 'package:subtrack/methods/fcm_methods.dart';
 import 'package:subtrack/models/plan_model.dart';
 import 'package:subtrack/models/subscription_model.dart';
 import 'package:subtrack/providers/category_chart_provider.dart';
@@ -201,7 +201,7 @@ class SubscriptionProvider with ChangeNotifier {
   bool success = false;
   bool isLoading = false;
 
-  NotificationMethods notificationMethods = NotificationMethods();
+  FcmMethods fcmMethods = FcmMethods();
 
   Future<bool> addSubscription({
     required BuildContext context,
@@ -264,11 +264,11 @@ class SubscriptionProvider with ChangeNotifier {
         );
         context.read<CategoryChartProvider>().fetchCategoryData();
       }
-      final token = await notificationMethods.getDeviceToken();
-      notificationMethods.sendPushNotification(
+      final token = await fcmMethods.getDeviceToken();
+      fcmMethods.sendPushNotification(
         deviceToken: token,
-        title: "SubTrack",
-        body: "Congrats! $subscriptionName Subscription Purchased!",
+        title: subscriptionName,
+        body: "$subscriptionName (${plan.name} Plan) Purchased!",
       );
       calculateBills();
 
@@ -362,12 +362,12 @@ class SubscriptionProvider with ChangeNotifier {
           success: true,
         );
       }
-      final token = await notificationMethods.getDeviceToken();
-      notificationMethods.sendPushNotification(
+      final token = await fcmMethods.getDeviceToken();
+      fcmMethods.sendPushNotification(
         deviceToken: token,
-        title: "SubTrack",
+        title: oldData.subscriptionName,
         body:
-            "${oldData.subscriptionName} Subscription Updated!",
+            "${oldData.subscriptionName} (${oldData.plan.name} Plan) Updated!",
       );
       calculateBills();
       success = true;
@@ -399,16 +399,16 @@ class SubscriptionProvider with ChangeNotifier {
       if (context.mounted) {
         context.read<CategoryChartProvider>().fetchCategoryData();
         showSnack(
-          text: "Subscription successfully deleted!",
+          text: "Subscription successfully cancelled!",
           context: context,
           success: true,
         );
       }
-      final token = await notificationMethods.getDeviceToken();
-      notificationMethods.sendPushNotification(
+      final token = await fcmMethods.getDeviceToken();
+      fcmMethods.sendPushNotification(
         deviceToken: token,
-        title: "SubTrack",
-        body: "$subName Subscription Deleted!",
+        title: subName,
+        body: "$subName Subscription Cancelled!",
       );
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {

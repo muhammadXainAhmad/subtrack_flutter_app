@@ -11,6 +11,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.textSize,
     this.isCenter = false,
     this.onTap,
+    this.actions,
   });
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -20,6 +21,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? textClr;
   final bool? isCenter;
   final VoidCallback? onTap;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           textWeight: FontWeight.w700,
         ),
       ),
+      actions: actions,
     );
   }
 }

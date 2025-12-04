@@ -5,10 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/methods/helper_methods.dart';
 import 'package:subtrack/models/subscription_model.dart';
-import 'package:subtrack/providers/notification_provider.dart';
+import 'package:subtrack/methods/notification_methods.dart';
 import 'package:subtrack/providers/segmented_btn_provider.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/providers/user_provider.dart';
+import 'package:subtrack/screens/notification_screen.dart';
 import 'package:subtrack/screens/settings_screen.dart';
 import 'package:subtrack/screens/subscription_details_screen.dart';
 import 'package:subtrack/utils/utils.dart';
@@ -21,7 +22,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<NotificationProvider>().init(context);
+    NotificationMethods().init(context);
     final user = context.watch<UserProvider>().getUser;
     final subProvider = context.watch<SubscriptionProvider>();
     final segmentedBtnProvider = context.watch<SegmentedBtnProvider>();
@@ -73,7 +74,14 @@ class HomeScreen extends StatelessWidget {
                     tooltipText: "Transaction History",
                   ),
                   _buildActionIcon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationScreen(),
+                        ),
+                      );
+                    },
                     path: "notification",
                     colorScheme: colorScheme,
                     tooltipText: "Notifications",

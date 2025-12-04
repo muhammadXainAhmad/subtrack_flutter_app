@@ -9,7 +9,6 @@ import 'package:subtrack/firebase_options.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/providers/bottom_nav_provider.dart';
 import 'package:subtrack/providers/category_chart_provider.dart';
-import 'package:subtrack/providers/notification_provider.dart';
 import 'package:subtrack/providers/segmented_btn_provider.dart';
 import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/providers/user_provider.dart';
@@ -51,7 +50,6 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) => CategoryChartProvider()..fetchCategoryData(),
         ),
-        ChangeNotifierProvider(create: (context) => NotificationProvider()),
       ],
       child: const MyApp(),
     ),

@@ -9,10 +9,12 @@ class CustomListTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.iconPath,
+    required this.onTapped,
   });
 
   final ColorScheme colorScheme;
   final String title, subtitle, iconPath;
+  final VoidCallback onTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class CustomListTile extends StatelessWidget {
         color: transparentClr,
         child: InkWell(
           borderRadius: BorderRadius.circular(25),
-          onTap: () {},
+          onTap: onTapped,
           child: ListTile(
             tileColor: colorScheme.surfaceContainerHigh,
             shape: RoundedRectangleBorder(

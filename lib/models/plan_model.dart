@@ -19,7 +19,7 @@ class PlanModel {
       billingCycle: map['billingCycle'] as String,
     );
   }
-  
+
   Map<String, dynamic> toMap() {
     return {
       'name': name,

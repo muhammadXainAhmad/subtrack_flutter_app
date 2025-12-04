@@ -6,9 +6,9 @@ import 'package:subtrack/providers/subscription_provider.dart';
 import 'package:subtrack/screens/add_subscription_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
+import 'package:subtrack/widgets/custom_alert_dialog.dart';
 import 'package:subtrack/widgets/custom_app_bar.dart';
 import 'package:subtrack/widgets/custom_elevated_button.dart';
-import 'package:subtrack/widgets/custom_text_button.dart';
 import 'package:subtrack/widgets/text.dart';
 import 'package:intl/intl.dart';
 
@@ -186,79 +186,24 @@ class SubscriptionDetailsScreen extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (context) {
-                                return AlertDialog(
-                                  alignment: Alignment.bottomCenter,
-                                  actionsAlignment: MainAxisAlignment.center,
-                                  backgroundColor:
-                                      colorScheme.surfaceContainerHigh,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    side: BorderSide(
-                                      color: colorScheme.surfaceContainerLowest,
-                                    ),
-                                  ),
-                                  title: BuildText(
-                                    textAlign: TextAlign.center,
-                                    text:
-                                        "Deleting ${subscriptionData.subscriptionName} Subscription",
-                                    textSize: 16,
-                                    textWeight: FontWeight.w600,
-                                  ),
-                                  content: BuildText(
-                                    textAlign: TextAlign.center,
-                                    text:
-                                        "Are you sure you want to cancel this subscription? This action cannot be reversed.",
-                                    textSize: 13,
-                                  ),
-                                  actions: [
-                                    CustomTextButton(
-                                      buttonStyle: TextButton.styleFrom(
-                                        backgroundColor: Colors.green.shade200,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                            color:
-                                                colorScheme.surfaceContainerLow,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            15,
-                                          ),
-                                        ),
-                                      ),
-                                      text: "Yes",
-                                      onPressed: () async {
-                                        await subProvider.deleteSubscription(
-                                          context: context,
-                                          subId:
-                                              subscriptionData.subscriptionId,
-                                          subName:
-                                              subscriptionData.subscriptionName,
-                                        );
-                                        if (context.mounted) {
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                    ),
-                                    const SizedBox(width: 14),
-                                    CustomTextButton(
-                                      buttonStyle: TextButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                            color:
-                                                colorScheme.surfaceContainerLow,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            15,
-                                          ),
-                                        ),
-                                      ),
-                                      text: "No",
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
+                                return CustomAlertDialog(
+                                  title:
+                                      "Cancel ${subscriptionData.subscriptionName} Subscription",
+                                  content:
+                                      "Are you sure you want to cancel this subscription? This action cannot be reversed.",
+                                  btnText: "Cancel",
+                                  onPressed: () async {
+                                    await subProvider.deleteSubscription(
+                                      context: context,
+                                      subId: subscriptionData.subscriptionId,
+                                      subName:
+                                          subscriptionData.subscriptionName,
+                                    );
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    }
+                                  },
                                 );
                               },
                             );

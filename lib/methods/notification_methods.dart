@@ -1,241 +1,75 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:googleapis_auth/auth_io.dart';
-import 'package:subtrack/screens/settings_screen.dart';
-import 'package:http/http.dart' as http;
+import 'package:subtrack/methods/fcm_methods.dart';
+import 'package:subtrack/models/notification_model.dart';
+import 'package:subtrack/utils/utils.dart';
+import 'package:uuid/uuid.dart';
 
 class NotificationMethods {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FcmMethods _methods = FcmMethods();
+  bool _initialized = false;
 
-  Future<AccessCredentials> accessServerKey() async {
-    final serviceAccountPath = dotenv.env['PATH_TO_KEY'];
-    String serviceAccountJson = await rootBundle.loadString(
-      serviceAccountPath!,
-    );
-    final serviceAccount = ServiceAccountCredentials.fromJson(
-      serviceAccountJson,
-    );
-    if (kDebugMode) {
-      print("json: $serviceAccountJson");
-    }
+  void init(BuildContext context) {
+    if (_initialized) return;
+    _initialized = true;
 
-    final scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-
-    final client = await clientViaServiceAccount(serviceAccount, scopes);
-    return client.credentials;
+    _methods.requestNotificationPermission();
+    _methods.onTokenRefresh();
+    _methods.firebaseInit(context);
+    _methods.messageInteraction(context);
+    _methods.getDeviceToken();
   }
 
-  Future<bool> sendPushNotification({
-    required String deviceToken,
+  Future<void> saveNotification({
     required String title,
     required String body,
-    Map<String, dynamic>? data,
+    required DateTime receivedAt,
   }) async {
-    if (deviceToken.isEmpty) return false;
-
-    final credentials = await accessServerKey();
-    final accessToken = credentials.accessToken.data;
-    final projectId = dotenv.env['PROJECT_ID'];
-
-    if (kDebugMode) {
-      print("Access Token: ${credentials.accessToken.data}");
-    }
-
-    final url = Uri.parse(
-      'https://fcm.googleapis.com/v1/projects/$projectId/messages:send',
-    );
-
-    final message = {
-      'message': {
-        'token': deviceToken,
-        'notification': {'title': title, 'body': body},
-        'data': data ?? {},
-      },
-    };
-
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $accessToken',
-      },
-      body: jsonEncode(message),
-    );
-
-    if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('Notification Successfully Sent!');
-      }
-      return true;
-    } else {
-      if (kDebugMode) {
-        print('Failed to Send Notification: ${response.body}');
-      }
-      return false;
-    }
-  }
-
-  void initLocalNotifications(
-    BuildContext context,
-    RemoteMessage message,
-  ) async {
-    var androidInitializationSettings = AndroidInitializationSettings(
-      "@mipmap/ic_launcher",
-    );
-    var iosInitializationSettings = DarwinInitializationSettings();
-
-    var initializationSettings = InitializationSettings(
-      android: androidInitializationSettings,
-      iOS: iosInitializationSettings,
-    );
-
-    await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (payload) async {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SettingsScreen()),
+    final String notificationId = Uuid().v1();
+    await _firestore
+        .collection("users")
+        .doc(_auth.currentUser!.uid)
+        .collection("notifications")
+        .doc(notificationId)
+        .set(
+          NotificationModel(
+            id: notificationId,
+            title: title,
+            body: body,
+            receivedAt: receivedAt,
+          ).toMap(),
         );
-      },
-    );
   }
 
-  // When app is in background
-  Future<void> messageInteraction(BuildContext context) async {
-    FirebaseMessaging.onMessageOpenedApp.listen((event) {
+  Future<void> clearNotifications(BuildContext context) async {
+    try {
+      final snapshot =
+          await _firestore
+              .collection("users")
+              .doc(_auth.currentUser!.uid)
+              .collection("notifications")
+              .get();
+      for (var doc in snapshot.docs) {
+        await doc.reference.delete();
+      }
       if (context.mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SettingsScreen()),
+        showSnack(
+          text: "All notifications cleared!",
+          context: context,
+          success: true,
         );
       }
-    });
-
-    // When app is terminated
-    RemoteMessage? initialMessage = await messaging.getInitialMessage();
-    if (initialMessage != null && context.mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => SettingsScreen()),
-      );
-    }
-  }
-
-  void firebaseInit(BuildContext context) {
-    FirebaseMessaging.onMessage.listen((message) {
-      if (kDebugMode) {
-        print("NOTIFICATION TITLE: ${message.notification!.title.toString()}");
-        print("NOTIFICATION BODY: ${message.notification!.body.toString()}");
-        print("NOTIFICATION DATA: ${message.data.toString()}");
+    } on FirebaseAuthException catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.message ?? "Something went wrong.", context: context);
       }
-      if (Platform.isAndroid && context.mounted) {
-        initLocalNotifications(context, message);
-        showNotification(message);
-      } else {
-        showNotification(message);
-      }
-    });
-  }
-
-  Future<void> showNotification(RemoteMessage message) async {
-    AndroidNotificationChannel channel = AndroidNotificationChannel(
-      "high_importance_channel",
-      "High Importance Notifications",
-      importance: Importance.max,
-    );
-    AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-          channel.id.toString(),
-          channel.name.toString(),
-          channelDescription: "Channel Description",
-          importance: Importance.max,
-          priority: Priority.high,
-          ticker: "Ticker",
-          icon: "@mipmap/ic_launcher",
-        );
-
-    DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        );
-
-    NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-      iOS: darwinNotificationDetails,
-    );
-    await _flutterLocalNotificationsPlugin.show(
-      1,
-      message.notification!.title.toString(),
-      message.notification!.body.toString(),
-      notificationDetails,
-    );
-  }
-
-  Future<String> getDeviceToken() async {
-    String? token = await messaging.getToken();
-    return token!;
-  }
-
-  void onTokenRefresh() {
-    messaging.onTokenRefresh.listen((event) {
-      event.toString();
-      if (kDebugMode) {
-        print("TOKEN REFRESHED!");
-      }
-    });
-  }
-
-  void requestNotificationPermission() async {
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: true,
-      badge: true,
-      carPlay: true,
-      provisional: true,
-      sound: true,
-    );
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      if (kDebugMode) {
-        print("PERMISSION GRANTED!");
-      }
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.provisional) {
-      if (kDebugMode) {
-        print("PROVISIONAL PERMISSION GRANTED!");
-      }
-    } else {
-      if (kDebugMode) {
-        print("PERMISSION DENIED!");
+    } catch (e) {
+      if (context.mounted) {
+        showSnack(text: e.toString(), context: context);
       }
     }
   }
 }
-
-/*
-For flutter_local_notifications: android\app\build.gradle.kts
-
-android{
-  compileOptions{
-  isCoreLibraryDesugaringEnabled = true
-  }
-}
-dependencies {
-   coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-}
-
-android\app\src\main\AndroidManifest.xml
-Add under <application>:
-  <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="high_importance_channel" />
- */

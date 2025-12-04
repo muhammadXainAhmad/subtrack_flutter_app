@@ -5,7 +5,7 @@ import 'package:subtrack/models/user_model.dart';
 class FirestoreMethods {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
-  
+
   Future<UserModel> getUserData() async {
     User currentUser = _auth.currentUser!;
     DocumentSnapshot snap =

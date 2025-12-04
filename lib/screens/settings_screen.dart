@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
+import 'package:subtrack/screens/notification_screen.dart';
 import 'package:subtrack/utils/utils.dart';
 import 'package:subtrack/widgets/bg_container.dart';
 import 'package:subtrack/widgets/custom_app_bar.dart';
@@ -32,30 +33,42 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: "View and edit your profile",
                   iconPath: "person",
                   colorScheme: colorScheme,
+                  onTapped: () {},
                 ),
                 CustomListTile(
                   title: "Notification",
                   subtitle: "View your notifications",
                   iconPath: "notification",
                   colorScheme: colorScheme,
+                  onTapped: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationScreen(),
+                      ),
+                    );
+                  },
                 ),
                 CustomListTile(
                   title: "Rate",
                   subtitle: "Rate us",
                   iconPath: "star",
                   colorScheme: colorScheme,
+                  onTapped: () {},
                 ),
                 CustomListTile(
                   title: "FAQ",
                   subtitle: "Find your answers",
                   iconPath: "person",
                   colorScheme: colorScheme,
+                  onTapped: () {},
                 ),
                 CustomListTile(
                   title: "Help & Support",
                   subtitle: "Reach out to us",
                   iconPath: "person",
                   colorScheme: colorScheme,
+                  onTapped: () {},
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24.0),
