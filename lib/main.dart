@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:subtrack/firebase_options.dart';
+import 'package:subtrack/methods/notification_methods.dart';
 import 'package:subtrack/providers/authentication_provider.dart';
 import 'package:subtrack/providers/bottom_nav_provider.dart';
 import 'package:subtrack/providers/category_chart_provider.dart';
@@ -19,9 +20,20 @@ import 'package:subtrack/utils/utils.dart';
 @pragma("vm:entry-point")
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  if (kDebugMode) {
-    print("TITLE: ${message.notification!.title.toString()}");
-    print("BODY: ${message.notification!.body.toString()}");
+  final notification = message.notification;
+  if (notification != null) {
+    NotificationMethods().saveNotification(
+      title: notification.title ?? "",
+      body: notification.body ?? "",
+      receivedAt: DateTime.now(),
+    );
+
+    if (kDebugMode) {
+      print("TITLE: ${notification.title}");
+      print("BODY: ${notification.body}");
+    }
+  } else if (kDebugMode) {
+    print("No notification payload in this message.");
   }
 }
 

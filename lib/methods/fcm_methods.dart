@@ -146,16 +146,30 @@ class FcmMethods {
 
   void firebaseInit(BuildContext context) {
     FirebaseMessaging.onMessage.listen((message) {
-      if (kDebugMode) {
-        print("NOTIFICATION TITLE: ${message.notification!.title.toString()}");
-        print("NOTIFICATION BODY: ${message.notification!.body.toString()}");
-        print("NOTIFICATION DATA: ${message.data.toString()}");
-      }
-      if (Platform.isAndroid && context.mounted) {
-        initLocalNotifications(context, message);
-        showNotification(message);
-      } else {
-        showNotification(message);
+      final notification = message.notification;
+      if (notification != null) {
+        NotificationMethods().saveNotification(
+          title: notification.title ?? "",
+          body: notification.body ?? "",
+          receivedAt: DateTime.now(),
+        );
+
+        if (kDebugMode) {
+          print("NOTIFICATION TITLE: ${notification.title}");
+          print("NOTIFICATION BODY: ${notification.body}");
+          print("NOTIFICATION DATA: ${message.data}");
+        }
+
+        if (Platform.isAndroid && context.mounted) {
+          initLocalNotifications(context, message);
+          showNotification(message);
+        } else {
+          showNotification(message);
+        }
+      } else if (kDebugMode) {
+        print(
+          "Received a message without notification payload: ${message.data}",
+        );
       }
     });
   }

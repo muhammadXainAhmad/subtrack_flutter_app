@@ -16,7 +16,7 @@ function formatDateInTimeZone(date, timeZone) {
 // Scheduled function: runs every day at 9 AM
 exports.sendSubscriptionReminders = onSchedule(
     {
-        schedule: "05 6 * * *",
+        schedule: "00 9 * * *",
         timeZone: "Asia/Karachi",
     },
     async (event) => {
@@ -59,7 +59,7 @@ exports.sendSubscriptionReminders = onSchedule(
                             token: deviceToken,
                             notification: {
                                 title: "Subscription Reminder",
-                                body: `${sub.subscriptionName} payment is due on ${formatDateInTimeZone(nextPayment, "Asia/Karachi")}`,
+                                body: `${sub.subscriptionName} payment is due on ${formatDateInTimeZone(nextPayment, "Asia/Karachi")}.`,
                             },
                         });
                         logger.info(`Notification sent for ${sub.subscriptionName}`);
