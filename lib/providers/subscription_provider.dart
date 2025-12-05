@@ -266,7 +266,7 @@ class SubscriptionProvider with ChangeNotifier {
       }
       final token = await fcmMethods.getDeviceToken();
       fcmMethods.sendPushNotification(
-        deviceToken: token,
+        deviceToken: token!,
         title: subscriptionName,
         body: "$subscriptionName (${plan.name} Plan) Purchased!",
       );
@@ -364,7 +364,7 @@ class SubscriptionProvider with ChangeNotifier {
       }
       final token = await fcmMethods.getDeviceToken();
       fcmMethods.sendPushNotification(
-        deviceToken: token,
+        deviceToken: token!,
         title: oldData.subscriptionName,
         body:
             "${oldData.subscriptionName} (${oldData.plan.name} Plan) Updated!",
@@ -406,7 +406,7 @@ class SubscriptionProvider with ChangeNotifier {
       }
       final token = await fcmMethods.getDeviceToken();
       fcmMethods.sendPushNotification(
-        deviceToken: token,
+        deviceToken: token!,
         title: subName,
         body: "$subName Subscription Cancelled!",
       );

@@ -1,1 +1,35 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"subtrack-77c1f","appId":"1:451814373655:android:03503f5d961cedc27f5f52","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"subtrack-77c1f","configurations":{"android":"1:451814373655:android:03503f5d961cedc27f5f52"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "subtrack-77c1f",
+          "appId": "1:451814373655:android:03503f5d961cedc27f5f52",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "subtrack-77c1f",
+          "configurations": {
+            "android": "1:451814373655:android:03503f5d961cedc27f5f52"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": []
+    }
+  ]
+}

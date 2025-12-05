@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -194,16 +196,25 @@ class FcmMethods {
     );
   }
 
-  Future<String> getDeviceToken() async {
+  Future<String?> getDeviceToken() async {
     String? token = await messaging.getToken();
-    return token!;
+    if (token != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .set({'deviceToken': token}, SetOptions(merge: true));
+    }
+    return token;
   }
 
   void onTokenRefresh() {
-    messaging.onTokenRefresh.listen((event) {
-      event.toString();
+    messaging.onTokenRefresh.listen((newToken) async {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .set({'deviceToken': newToken}, SetOptions(merge: true));
       if (kDebugMode) {
-        print("TOKEN REFRESHED!");
+        print("TOKEN REFRESHED: $newToken");
       }
     });
   }
